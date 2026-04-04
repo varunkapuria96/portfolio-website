@@ -25,6 +25,7 @@ Both flows converge on a single shared `ChangePasswordForm` component that calls
 - On success: shows "Password updated successfully" message
 - On error: shows Supabase error message inline
 - Accepts optional `onCancel` prop — renders a Cancel button when provided, omits it when not
+- Accepts optional `onSuccess` prop — called after a successful password update (used by `App.jsx` to clear recovery state)
 
 ### Modified: `src/components/AuthForm.jsx`
 
@@ -50,7 +51,7 @@ Adds a `'forgot'` mode alongside the existing `'signin'` and `'signup'` modes.
 - New `isRecovery` boolean state (default `false`)
 - When `PASSWORD_RECOVERY` fires: set `isRecovery(true)`
 - Render priority: `session === undefined` → null | `isRecovery` → `ChangePasswordForm` (no `onCancel`) | `session` → `TodoApp` | else → `AuthForm`
-- After `ChangePasswordForm` succeeds in recovery mode: `isRecovery` is cleared, user lands on `TodoApp`
+- Passes `onSuccess={() => setIsRecovery(false)}` to `ChangePasswordForm` in recovery mode — clears recovery state after successful update, landing user on `TodoApp`
 
 ---
 
