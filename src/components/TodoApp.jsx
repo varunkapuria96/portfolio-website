@@ -25,8 +25,10 @@ export default function TodoApp({ session }) {
       .insert({ text: text.trim(), user_id: session.user.id })
       .select()
       .single()
-    if (data) setTodos(prev => [...prev, data])
-    setText('')
+    if (data) {
+      setTodos(prev => [...prev, data])
+      setText('')
+    }
   }
 
   async function toggleTodo(id, completed) {
@@ -40,8 +42,8 @@ export default function TodoApp({ session }) {
   }
 
   async function deleteTodo(id) {
-    await supabase.from('todos').delete().eq('id', id)
-    setTodos(prev => prev.filter(t => t.id !== id))
+    const { error } = await supabase.from('todos').delete().eq('id', id)
+    if (!error) setTodos(prev => prev.filter(t => t.id !== id))
   }
 
   return (
