@@ -4,12 +4,12 @@ export default function Nav() {
   const { pathname } = useLocation()
 
   return (
-    <nav className="nav">
+    <nav className="nav" aria-label="Main navigation">
       <Link to="/" className="nav-logo">
         VK<span>.</span>
       </Link>
       <div className="nav-links">
-        <Link to="/" className={pathname === '/' ? 'active' : ''}>
+        <Link to="/" className={pathname === '/' ? 'active' : undefined}>
           home
         </Link>
         <a href="/#experiments">projects</a>

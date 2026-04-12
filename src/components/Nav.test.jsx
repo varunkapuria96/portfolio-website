@@ -10,9 +10,11 @@ function renderNav(initialPath = '/') {
   )
 }
 
-test('renders VK. logo', () => {
+test('renders VK. logo as a link to /', () => {
   renderNav()
-  expect(screen.getByText('VK')).toBeInTheDocument()
+  const logo = screen.getByRole('link', { name: /vk/i })
+  expect(logo).toBeInTheDocument()
+  expect(logo).toHaveAttribute('href', '/')
 })
 
 test('renders home link', () => {
@@ -20,9 +22,11 @@ test('renders home link', () => {
   expect(screen.getByRole('link', { name: /^home$/i })).toBeInTheDocument()
 })
 
-test('renders projects link', () => {
+test('renders projects link to experiments section', () => {
   renderNav()
-  expect(screen.getByRole('link', { name: /^projects$/i })).toBeInTheDocument()
+  const link = screen.getByRole('link', { name: /^projects$/i })
+  expect(link).toBeInTheDocument()
+  expect(link).toHaveAttribute('href', '/#experiments')
 })
 
 test('home link has active class on /', () => {
@@ -35,7 +39,9 @@ test('home link does not have active class on /projects/todo', () => {
   expect(screen.getByRole('link', { name: /^home$/i })).not.toHaveClass('active')
 })
 
-test('renders email contact link', () => {
+test('renders email contact link with mailto href', () => {
   renderNav()
-  expect(screen.getByRole('link', { name: /varunkapuria@arizona\.edu/i })).toBeInTheDocument()
+  const link = screen.getByRole('link', { name: /varunkapuria@arizona\.edu/i })
+  expect(link).toBeInTheDocument()
+  expect(link).toHaveAttribute('href', 'mailto:varunkapuria@arizona.edu')
 })
