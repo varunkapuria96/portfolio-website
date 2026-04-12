@@ -57,7 +57,7 @@ function ProjectCard({ lang, name, desc, tags, live, href }) {
 
   if (live) {
     return (
-      <Link to={href} className={className} aria-label={name}>
+      <Link to={href} className={className}>
         <span className="live-badge">LIVE</span>
         <div className="project-lang">{lang}</div>
         <div className="project-name">{name}</div>
@@ -75,7 +75,6 @@ function ProjectCard({ lang, name, desc, tags, live, href }) {
       target="_blank"
       rel="noreferrer"
       className={className}
-      aria-label={name}
     >
       <div className="project-lang">{lang}</div>
       <div className="project-name">{name}</div>
@@ -111,7 +110,7 @@ export default function Portfolio() {
             GitHub ↗
           </a>
           <a
-            href="https://linkedin.com/in/varunkapuria96"
+            href="https://www.linkedin.com/in/varunkapuria96"
             target="_blank"
             rel="noreferrer"
           >
