@@ -6,7 +6,7 @@ import Portfolio from './components/Portfolio'
 import AuthForm from './components/AuthForm'
 import TodoApp from './components/TodoApp'
 
-function TodoRoute() {
+export function TodoRoute() {
   const [session, setSession] = useState(undefined)
 
   useEffect(() => {
