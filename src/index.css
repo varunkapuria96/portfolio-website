@@ -666,6 +666,12 @@ body {
   font-size: 14px;
 }
 
+.auth-info {
+  color: #00ff88;
+  font-size: 14px;
+  text-align: center;
+}
+
 .todo-container ul {
   list-style: none;
   display: flex;

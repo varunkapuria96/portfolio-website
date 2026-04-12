@@ -6,9 +6,11 @@ import Portfolio from './components/Portfolio'
 import SqlWebsite from './components/SqlWebsite'
 import AuthForm from './components/AuthForm'
 import TodoApp from './components/TodoApp'
+import ResetPassword from './components/ResetPassword'
 
 export function TodoRoute() {
   const [session, setSession] = useState(undefined)
+  const [recoveryMode, setRecoveryMode] = useState(false)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -16,13 +18,21 @@ export function TodoRoute() {
     })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => setSession(session)
+      (event, session) => {
+        if (event === 'PASSWORD_RECOVERY') {
+          setRecoveryMode(true)
+        } else {
+          setRecoveryMode(false)
+        }
+        setSession(session)
+      }
     )
 
     return () => subscription.unsubscribe()
   }, [])
 
   if (session === undefined) return null
+  if (session && recoveryMode) return <ResetPassword onDone={() => setRecoveryMode(false)} />
   return session ? <TodoApp session={session} /> : <AuthForm />
 }
 
