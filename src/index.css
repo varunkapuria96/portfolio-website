@@ -700,6 +700,32 @@ body {
   cursor: pointer;
 }
 
+/* ===== RESPONSIVE — AUTH FORM ===== */
+@media (max-width: 600px) {
+  .auth-container {
+    padding: 32px 16px 16px;
+    gap: 12px;
+  }
+
+  .auth-container form {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .auth-container input[type='email'],
+  .auth-container input[type='password'],
+  .auth-container input[type='text'] {
+    width: 100%;
+    font-size: 15px;
+  }
+
+  .auth-container button[type='submit'] {
+    width: 100%;
+    font-size: 15px;
+    padding: 10px 16px;
+  }
+}
+
 /* ===== RESPONSIVE — TABLET (≤768px) ===== */
 @media (max-width: 768px) {
   .projects-grid {
