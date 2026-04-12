@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import App, { TodoRoute } from './App'
 
@@ -19,8 +19,9 @@ test('renders Nav and Portfolio at default route', () => {
   expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Varun')
 })
 
-test('TodoRoute renders nothing while session is loading', () => {
-  // getSession never resolves = session stays undefined = null render
+test('TodoRoute renders nothing while session is loading', async () => {
+  const { supabase } = await import('./supabase')
+  supabase.auth.getSession.mockImplementationOnce(() => new Promise(() => {}))
   const { container } = render(
     <MemoryRouter>
       <TodoRoute />
