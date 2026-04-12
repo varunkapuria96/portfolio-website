@@ -38,9 +38,10 @@ const PROJECTS = [
     id: 'retail',
     lang: 'SQL / PHP',
     name: 'Retail Website + SQL',
-    desc: 'Full backend with DDL, DML, DCL scripts and ASP.NET frontend for Harbor Freight.',
-    tags: ['SQL', 'PHP', 'ASP.NET'],
-    href: 'https://github.com/varunkapuria96/Website-Implementation-with-SQL',
+    desc: 'Full-stack e-commerce site for Harbor Freight — 22-table Oracle schema, PHP frontend, hosted on EC2.',
+    tags: ['Oracle SQL', 'PHP', 'EC2'],
+    docs: true,
+    href: '/projects/sql-website',
   },
   {
     id: 'etl',
@@ -52,13 +53,15 @@ const PROJECTS = [
   },
 ]
 
-function ProjectCard({ lang, name, desc, tags, live, href }) {
-  const className = `project-card${live ? ' live' : ''}`
+function ProjectCard({ lang, name, desc, tags, live, docs, href }) {
+  const className = `project-card${live ? ' live' : ''}${docs ? ' docs' : ''}`
+  const isInternal = live || docs
 
-  if (live) {
+  if (isInternal) {
     return (
       <Link to={href} className={className}>
-        <span className="live-badge">LIVE</span>
+        {live && <span className="live-badge">LIVE</span>}
+        {docs && <span className="docs-badge">DOCS</span>}
         <div className="project-lang">{lang}</div>
         <div className="project-name">{name}</div>
         <div className="project-desc">{desc}</div>

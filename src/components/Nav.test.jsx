@@ -41,7 +41,7 @@ test('home link does not have active class on /projects/todo', () => {
 
 test('renders email contact link with mailto href', () => {
   renderNav()
-  const link = screen.getByRole('link', { name: /varunkapuria@arizona\.edu/i })
+  const link = screen.getByRole('link', { name: /me@varunkapuria\.xyz/i })
   expect(link).toBeInTheDocument()
-  expect(link).toHaveAttribute('href', 'mailto:varunkapuria@arizona.edu')
+  expect(link).toHaveAttribute('href', 'mailto:me@varunkapuria.xyz')
 })

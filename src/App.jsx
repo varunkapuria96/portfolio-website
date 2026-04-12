@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from './supabase'
 import Nav from './components/Nav'
 import Portfolio from './components/Portfolio'
+import SqlWebsite from './components/SqlWebsite'
 import AuthForm from './components/AuthForm'
 import TodoApp from './components/TodoApp'
 
@@ -32,6 +33,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Portfolio />} />
         <Route path="/projects/todo" element={<TodoRoute />} />
+        <Route path="/projects/sql-website" element={<SqlWebsite />} />
       </Routes>
     </BrowserRouter>
   )
