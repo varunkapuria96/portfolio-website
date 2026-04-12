@@ -1,5 +1,33 @@
 import { Link } from 'react-router-dom'
 
+const EXPERIENCE = [
+  {
+    id: 'cc',
+    company: 'Constant Contact',
+    role: 'Sales Analyst',
+    period: 'July 2024 – Present',
+    location: 'Boston, MA',
+    bullets: [
+      'Managed compensation reporting of 100+ sales reps and 2 business functions globally through Tableau dashboards',
+      'Architected Systems Monitoring framework with a prioritized failure response list, reducing downtime by 15%',
+      'Collaborated with a cross-functional team of 8 to ship 6 new features via agile sprint and backlog management',
+    ],
+  },
+  {
+    id: 'bs',
+    company: 'BrowserStack',
+    role: 'Sales Analyst',
+    period: 'April 2020 – July 2022',
+    location: 'Mumbai, IN',
+    bullets: [
+      'Led development of MQL model with behavior-based targeting, resulting in 40% higher sales conversion',
+      'Formulated customer acquisition strategies through behavior analysis, resulting in $3.8M increased ARR',
+      'Leveraged SQL, Looker, and BigQuery to analyze low-revenue accounts, increasing customer engagement by 23%',
+      'Executed in-depth prospect analysis for B2B Salesforce SaaS CRM platform, improving lead generation by 50%',
+    ],
+  },
+]
+
 const PROJECTS = [
   {
     id: 'todo',
@@ -119,6 +147,32 @@ export default function Portfolio() {
             LinkedIn ↗
           </a>
         </div>
+      </section>
+
+      <div className="section-label">
+        <span>// experience</span>
+      </div>
+
+      <section className="experience-list">
+        {EXPERIENCE.map(exp => (
+          <div key={exp.id} className="exp-item">
+            <div className="exp-header">
+              <div className="exp-left">
+                <span className="exp-company">{exp.company}</span>
+                <span className="exp-role">{exp.role}</span>
+              </div>
+              <div className="exp-right">
+                <span className="exp-period">{exp.period}</span>
+                <span className="exp-location">{exp.location}</span>
+              </div>
+            </div>
+            <ul className="exp-bullets">
+              {exp.bullets.map((b, i) => (
+                <li key={i}>{b}</li>
+              ))}
+            </ul>
+          </div>
+        ))}
       </section>
 
       <div className="section-label">
