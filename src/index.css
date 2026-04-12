@@ -489,6 +489,78 @@ body {
   color: #888;
 }
 
+/* ===== DOC CODE BLOCKS ===== */
+.doc-code-block {
+  margin-bottom: 16px;
+}
+
+.code-block-label {
+  font-size: 10px;
+  color: #00ff88;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.doc-pre {
+  background: #111;
+  border: 1px solid #1a1a1a;
+  border-radius: 4px;
+  padding: 16px 20px;
+  overflow-x: auto;
+  margin: 0;
+}
+
+.doc-pre code {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 11px;
+  color: #00ff88;
+  line-height: 1.7;
+  white-space: pre;
+}
+
+/* ===== DOC QUERIES / TRIGGERS ===== */
+.doc-query {
+  margin-bottom: 32px;
+}
+
+.query-header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.query-num {
+  font-size: 10px;
+  color: #00ff88;
+  border: 1px solid #00ff88;
+  padding: 2px 7px;
+  border-radius: 2px;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+.query-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* ===== DOC TWO-COL ===== */
+.doc-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 700px) {
+  .doc-two-col {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ===== PORTFOLIO FOOTER ===== */
 .portfolio-footer {
   border-top: 1px solid #1a1a1a;
