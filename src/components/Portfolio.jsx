@@ -160,7 +160,7 @@ export default function Portfolio() {
             GitHub ↗
           </a>
           <a
-            href="https://www.linkedin.com/in/varunkapuria96"
+            href="https://www.linkedin.com/in/varun-kapuria/"
             target="_blank"
             rel="noreferrer"
           >
