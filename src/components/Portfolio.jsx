@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom'
 
-const EXPERIENCE = [
+const TIMELINE = [
   {
     id: 'cc',
-    company: 'Constant Contact',
-    role: 'Sales Analyst',
+    type: 'work',
+    title: 'Constant Contact',
+    sub: 'Sales Analyst',
     period: 'July 2024 – Present',
     location: 'Boston, MA',
     bullets: [
@@ -14,9 +15,18 @@ const EXPERIENCE = [
     ],
   },
   {
+    id: 'ua',
+    type: 'edu',
+    title: 'University of Arizona',
+    sub: 'MS Management Information Systems',
+    period: '2022 – 2024',
+    location: 'Tucson, AZ',
+  },
+  {
     id: 'bs',
-    company: 'BrowserStack',
-    role: 'Sales Analyst',
+    type: 'work',
+    title: 'BrowserStack',
+    sub: 'Sales Analyst',
     period: 'April 2020 – July 2022',
     location: 'Mumbai, IN',
     bullets: [
@@ -25,6 +35,22 @@ const EXPERIENCE = [
       'Leveraged SQL, Looker, and BigQuery to analyze low-revenue accounts, increasing customer engagement by 23%',
       'Executed in-depth prospect analysis for B2B Salesforce SaaS CRM platform, improving lead generation by 50%',
     ],
+  },
+  {
+    id: 'mba',
+    type: 'edu',
+    title: 'Narsee Monjee Institute of Management Studies',
+    sub: 'Master of Business Administration',
+    period: '2018 – 2020',
+    location: 'Mumbai, IN',
+  },
+  {
+    id: 'btech',
+    type: 'edu',
+    title: 'Narsee Monjee Institute of Management Studies',
+    sub: 'BTech Information Technology',
+    period: '2014 – 2018',
+    location: 'Mumbai, IN',
   },
 ]
 
@@ -150,29 +176,30 @@ export default function Portfolio() {
       </section>
 
       <div className="section-label">
-        <span>// experience</span>
+        <span>// timeline</span>
       </div>
 
-      <section className="experience-list">
-        {EXPERIENCE.map(exp => (
-          <div key={exp.id} className="exp-item">
-            <div className="exp-header">
-              <div className="exp-left">
-                <span className="exp-company">{exp.company}</span>
-                <span className="exp-role">{exp.role}</span>
+      <section className="timeline">
+        <div className="timeline-track">
+          {TIMELINE.map(entry => (
+            <div key={entry.id} className={`timeline-entry timeline-${entry.type}`}>
+              <div className="timeline-dot" />
+              <div className="timeline-meta">
+                <span className="timeline-period">{entry.period}</span>
+                <span className="timeline-location">{entry.location}</span>
               </div>
-              <div className="exp-right">
-                <span className="exp-period">{exp.period}</span>
-                <span className="exp-location">{exp.location}</span>
-              </div>
+              <div className="timeline-title">{entry.title}</div>
+              <div className="timeline-sub">{entry.sub}</div>
+              {entry.bullets && (
+                <ul className="timeline-bullets">
+                  {entry.bullets.map((b, i) => (
+                    <li key={i}>{b}</li>
+                  ))}
+                </ul>
+              )}
             </div>
-            <ul className="exp-bullets">
-              {exp.bullets.map((b, i) => (
-                <li key={i}>{b}</li>
-              ))}
-            </ul>
-          </div>
-        ))}
+          ))}
+        </div>
       </section>
 
       <div className="section-label">
