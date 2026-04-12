@@ -97,8 +97,7 @@ export default function Portfolio() {
         </h1>
         <p className="hero-sub">
           Sales analyst turned builder. I use data to drive decisions at work —
-          and build small experiments on the side to learn how things actually
-          get made.
+          and build small experiments on the side to learn how things get made.
         </p>
         <div className="hero-links">
           <a href="#experiments" className="btn-primary">↓ projects</a>
@@ -131,7 +130,7 @@ export default function Portfolio() {
 
       <footer className="portfolio-footer">
         <span>varun kapuria</span>
-        <span>seattle, wa · built with <span className="accent">react</span></span>
+        <span>boston, ma · built with <span className="accent">react</span></span>
       </footer>
     </>
   )

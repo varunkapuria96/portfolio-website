@@ -14,10 +14,10 @@ export default function Nav() {
         </Link>
         <a href="/#experiments">projects</a>
         <a
-          href="mailto:varunkapuria@arizona.edu"
+          href="mailto:me@varunkapuria.xyz"
           className="nav-cta"
         >
-          varunkapuria@arizona.edu
+          me@varunkapuria.xyz
         </a>
       </div>
     </nav>
