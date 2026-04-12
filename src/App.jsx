@@ -21,7 +21,7 @@ export function TodoRoute() {
       (event, session) => {
         if (event === 'PASSWORD_RECOVERY') {
           setRecoveryMode(true)
-        } else {
+        } else if (event === 'SIGNED_OUT') {
           setRecoveryMode(false)
         }
         setSession(session)
