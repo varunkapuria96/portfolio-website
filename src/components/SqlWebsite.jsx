@@ -933,14 +933,19 @@ export default function SqlWebsite() {
           <p className="doc-text">
             All 22 tables use sequence-backed BEFORE INSERT triggers for primary key generation.
             Referential integrity is enforced with foreign key constraints; cascades and set-null
-            rules are specified per relationship.
+            rules are specified per relationship. Hover any table to see its CREATE TABLE statement.
           </p>
-          {DDL_TABLES.map(t => (
-            <div key={t.name} className="doc-code-block">
-              <div className="code-block-label">{t.name}</div>
-              <pre className="doc-pre"><code>{t.sql}</code></pre>
-            </div>
-          ))}
+          <div className="ddl-list">
+            {DDL_TABLES.map(t => (
+              <div key={t.name} className="ddl-row">
+                <span className="ddl-table-name">{t.name}</span>
+                <span className="ddl-hint">hover for DDL</span>
+                <div className="ddl-popup">
+                  <pre className="doc-pre"><code>{t.sql}</code></pre>
+                </div>
+              </div>
+            ))}
+          </div>
         </section>
 
         {/* QUERIES */}
