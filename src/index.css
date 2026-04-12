@@ -62,9 +62,9 @@ body {
   font-size: 12px;
 }
 
-.nav-cta:hover {
-  border-color: #00ff88 !important;
-  color: #00ff88 !important;
+.nav-links a.nav-cta:hover {
+  border-color: #00ff88;
+  color: #00ff88;
 }
 
 /* ===== HERO ===== */
@@ -77,7 +77,6 @@ body {
   font-size: 11px;
   color: #00ff88;
   letter-spacing: 3px;
-  text-transform: uppercase;
   margin-bottom: 16px;
 }
 
@@ -249,13 +248,22 @@ body {
   border-top: 1px solid #1a1a1a;
   padding: 20px 40px;
   font-size: 11px;
-  color: #333;
+  color: #555;
   display: flex;
   justify-content: space-between;
 }
 
 .portfolio-footer .accent {
   color: #00ff88;
+}
+
+/* ===== ACCESSIBILITY ===== */
+.nav-links a:focus-visible,
+.nav-logo:focus-visible,
+.project-card:focus-visible,
+.hero-links a:focus-visible {
+  outline: 2px solid #00ff88;
+  outline-offset: 2px;
 }
 
 /* ===== AUTH + TODO (dark-themed, scoped) ===== */
@@ -274,13 +282,14 @@ body {
   color: #fff;
 }
 
-.header {
+.todo-container .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-form {
+.auth-container form,
+.todo-container form {
   display: flex;
   gap: 8px;
 }
@@ -305,7 +314,8 @@ input[type='text']:focus {
   border-color: #00ff88;
 }
 
-button {
+.auth-container button,
+.todo-container button {
   padding: 8px 16px;
   border: none;
   border-radius: 4px;
@@ -316,12 +326,14 @@ button {
   font-family: 'Courier New', Courier, monospace;
 }
 
-button:disabled {
+.auth-container button:disabled,
+.todo-container button:disabled {
   opacity: 0.6;
   cursor: default;
 }
 
-button.toggle {
+.auth-container button.toggle,
+.todo-container button.toggle {
   background: transparent;
   color: #00ff88;
   padding: 0;
@@ -334,7 +346,7 @@ button.toggle {
   font-size: 14px;
 }
 
-ul {
+.todo-container ul {
   list-style: none;
   display: flex;
   flex-direction: column;
