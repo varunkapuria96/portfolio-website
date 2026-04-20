@@ -27,7 +27,7 @@ test('renders LinkedIn link with correct href', () => {
   renderPortfolio()
   const link = screen.getByRole('link', { name: /linkedin/i })
   expect(link).toBeInTheDocument()
-  expect(link).toHaveAttribute('href', 'https://www.linkedin.com/in/varunkapuria96')
+  expect(link).toHaveAttribute('href', 'https://www.linkedin.com/in/varun-kapuria/')
 })
 
 test('renders all 6 project cards', () => {
