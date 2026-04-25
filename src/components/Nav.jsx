@@ -13,10 +13,13 @@ export default function Nav() {
           home
         </Link>
         <a href="/#experiments">projects</a>
-        <a
-          href="mailto:me@varunkapuria.xyz"
-          className="nav-cta"
+        <Link
+          to="/projects/bills"
+          className={pathname.startsWith('/projects/bills') ? 'active' : undefined}
         >
+          bills
+        </Link>
+        <a href="mailto:me@varunkapuria.xyz" className="nav-cta">
           me@varunkapuria.xyz
         </a>
       </div>

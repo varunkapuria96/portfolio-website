@@ -7,6 +7,7 @@ import SqlWebsite from './components/SqlWebsite'
 import AuthForm from './components/AuthForm'
 import TodoApp from './components/TodoApp'
 import ResetPassword from './components/ResetPassword'
+import BillsApp from './components/BillsApp'
 
 export function TodoRoute() {
   const [session, setSession] = useState(undefined)
@@ -36,6 +37,25 @@ export function TodoRoute() {
   return session ? <TodoApp session={session} /> : <AuthForm />
 }
 
+export function BillRoute() {
+  const [session, setSession] = useState(undefined)
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+    })
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_, session) => setSession(session)
+    )
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  if (session === undefined) return null
+  return session ? <BillsApp session={session} /> : <AuthForm />
+}
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -44,6 +64,7 @@ export default function App() {
         <Route path="/" element={<Portfolio />} />
         <Route path="/projects/todo" element={<TodoRoute />} />
         <Route path="/projects/sql-website" element={<SqlWebsite />} />
+        <Route path="/projects/bills" element={<BillRoute />} />
       </Routes>
     </BrowserRouter>
   )
