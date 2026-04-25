@@ -1051,3 +1051,497 @@ body {
     gap: 2px;
   }
 }
+
+/* ===== BILLS APP ===== */
+.bills-app {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 24px;
+}
+
+.bills-tabs {
+  display: flex;
+  border-bottom: 1px solid #222;
+  margin-bottom: 32px;
+  gap: 0;
+}
+
+.bills-tabs button {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: #555;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  letter-spacing: 0.3px;
+  padding: 10px 20px;
+  transition: color 0.2s;
+  margin-bottom: -1px;
+}
+
+.bills-tabs button:hover { color: #e0e0e0; }
+.bills-tabs button.active { border-bottom-color: #00ff88; color: #00ff88; }
+
+/* Manage sections */
+.manage-section { max-width: 560px; }
+
+.manage-section h2 {
+  color: #00ff88;
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  margin-bottom: 20px;
+}
+
+.manage-list { list-style: none; margin-bottom: 20px; }
+
+.manage-item {
+  align-items: center;
+  border-bottom: 1px solid #1a1a1a;
+  display: flex;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.manage-item span {
+  color: #e0e0e0;
+  cursor: pointer;
+  flex: 1;
+  font-size: 13px;
+}
+
+.manage-item span:hover { color: #00ff88; }
+
+.manage-input {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 3px;
+  color: #e0e0e0;
+  flex: 1;
+  font-family: inherit;
+  font-size: 13px;
+  padding: 5px 10px;
+}
+
+.manage-input:focus { border-color: #00ff88; outline: none; }
+
+.manage-delete {
+  background: none;
+  border: none;
+  color: #333;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 2px 6px;
+}
+
+.manage-delete:hover { color: #ff4444; }
+
+.manage-add-form { display: flex; gap: 8px; }
+
+.manage-add-btn {
+  background: none;
+  border: 1px solid #333;
+  border-radius: 3px;
+  color: #00ff88;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  padding: 5px 16px;
+}
+
+.manage-add-btn:hover { border-color: #00ff88; }
+
+/* Products table */
+.products-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+
+.products-table th {
+  color: #444;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  padding: 6px 8px;
+  text-align: left;
+  text-transform: uppercase;
+  border-bottom: 1px solid #222;
+}
+
+.products-table td { padding: 6px 8px; border-bottom: 1px solid #1a1a1a; }
+
+.products-table input,
+.products-table select {
+  background: #1a1a1a;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  color: #e0e0e0;
+  font-family: inherit;
+  font-size: 13px;
+  padding: 4px 8px;
+  width: 100%;
+}
+
+.products-table input:focus,
+.products-table select:focus { border-color: #00ff88; outline: none; }
+
+.products-table input[type="number"] { width: 80px; }
+
+/* Bills list */
+.bills-list-header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.bills-list-header h2 { color: #00ff88; font-size: 15px; font-weight: 400; }
+
+.new-bill-btn {
+  background: none;
+  border: 1px solid #00ff88;
+  border-radius: 3px;
+  color: #00ff88;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  padding: 6px 16px;
+}
+
+.new-bill-btn:hover { background: #00ff8811; }
+
+.bills-table { border-collapse: collapse; font-size: 13px; width: 100%; }
+
+.bills-table th {
+  border-bottom: 1px solid #222;
+  color: #444;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  padding: 8px 12px;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.bills-table td { border-bottom: 1px solid #1a1a1a; color: #e0e0e0; padding: 12px; }
+.bills-table tr:hover td { background: #111; cursor: pointer; }
+
+.bills-table .action-btn {
+  background: none;
+  border: none;
+  color: #444;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  padding: 2px 6px;
+}
+
+.bills-table .action-btn:hover { color: #ff4444; }
+.bills-empty { color: #444; font-size: 13px; padding: 40px 0; text-align: center; }
+
+/* Bill editor */
+.bill-editor-nav {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 32px;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  color: #555;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  padding: 0;
+}
+
+.back-btn:hover { color: #00ff88; }
+
+.print-btn {
+  background: none;
+  border: 1px solid #333;
+  border-radius: 3px;
+  color: #888;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  padding: 5px 16px;
+}
+
+.print-btn:hover { border-color: #00ff88; color: #00ff88; }
+
+.bill-header-fields { display: flex; gap: 16px; margin-bottom: 40px; }
+
+.bill-customer-input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #333;
+  color: #e0e0e0;
+  flex: 1;
+  font-family: inherit;
+  font-size: 18px;
+  padding: 6px 0;
+}
+
+.bill-customer-input:focus { border-bottom-color: #00ff88; outline: none; }
+
+.bill-date-input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #333;
+  color: #888;
+  font-family: inherit;
+  font-size: 13px;
+  padding: 6px 0;
+  width: 140px;
+}
+
+.bill-date-input:focus { border-bottom-color: #00ff88; outline: none; }
+
+/* Bill room section */
+.bill-room { margin-bottom: 40px; }
+
+.bill-room-header {
+  align-items: center;
+  border-bottom: 1px solid #00ff8840;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+}
+
+.bill-room-name { color: #00ff88; font-size: 14px; font-weight: 700; letter-spacing: 0.5px; }
+
+.room-delete-btn {
+  background: none;
+  border: none;
+  color: #333;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 11px;
+  padding: 2px 6px;
+}
+
+.room-delete-btn:hover { color: #ff4444; }
+
+/* Items table */
+.bill-items-table { border-collapse: collapse; font-size: 12px; margin-bottom: 8px; width: 100%; }
+
+.bill-items-table th {
+  color: #444;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  padding: 4px 8px;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.bill-items-table td { border-bottom: 1px solid #111; padding: 4px 8px; }
+
+.bill-items-table select {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  color: #e0e0e0;
+  font-family: inherit;
+  font-size: 12px;
+  padding: 3px 4px;
+  width: 100%;
+}
+
+.bill-items-table select:focus { border-color: #00ff88; outline: none; }
+
+.bill-items-table input[type="number"] {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  color: #e0e0e0;
+  font-family: inherit;
+  font-size: 12px;
+  padding: 3px 6px;
+  text-align: right;
+  width: 80px;
+}
+
+.bill-items-table input[type="number"]:focus { border-color: #00ff88; outline: none; }
+
+.item-unit { color: #555; font-size: 11px; }
+.item-total { color: #00ff88; text-align: right; }
+
+.item-delete-btn {
+  background: none;
+  border: none;
+  color: #2a2a2a;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0 4px;
+}
+
+.item-delete-btn:hover { color: #ff4444; }
+
+.room-footer { align-items: center; display: flex; justify-content: space-between; margin-top: 6px; }
+
+.add-item-btn {
+  background: none;
+  border: none;
+  color: #444;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  padding: 4px 8px 4px 0;
+}
+
+.add-item-btn:hover { color: #00ff88; }
+.room-subtotal { color: #666; font-size: 12px; }
+
+/* Add room */
+.add-room-section { margin-bottom: 40px; }
+
+.add-room-select {
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 3px;
+  color: #555;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  padding: 8px 16px;
+}
+
+.add-room-select:focus { border-color: #00ff88; outline: none; }
+
+/* Grand total block */
+.grand-total-section {
+  border-top: 1px solid #222;
+  margin-left: auto;
+  margin-top: 20px;
+  max-width: 360px;
+  padding-top: 20px;
+}
+
+.total-row {
+  align-items: center;
+  color: #888;
+  display: flex;
+  font-size: 13px;
+  justify-content: space-between;
+  padding: 6px 0;
+}
+
+.total-row input[type="number"] {
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 3px;
+  color: #e0e0e0;
+  font-family: inherit;
+  font-size: 13px;
+  padding: 3px 8px;
+  text-align: right;
+  width: 110px;
+}
+
+.total-row input[type="number"]:focus { border-color: #00ff88; outline: none; }
+
+.total-row.grand-total {
+  border-bottom: 1px solid #333;
+  border-top: 1px solid #333;
+  color: #e0e0e0;
+  font-size: 15px;
+  margin: 6px 0;
+  padding: 8px 0;
+}
+
+.total-row.grand-total span:last-child { color: #00ff88; }
+
+.total-row.balance-due {
+  border-top: 1px solid #00ff8840;
+  color: #00ff88;
+  font-size: 15px;
+  font-weight: 700;
+  margin-top: 4px;
+  padding-top: 10px;
+}
+
+/* ===== PRINT STYLES ===== */
+.bill-print { display: none; }
+
+@media print {
+  .nav,
+  .bills-tabs,
+  .bill-editor-nav,
+  .room-delete-btn,
+  .add-item-btn,
+  .item-delete-btn,
+  .add-room-section,
+  .grand-total-section input,
+  .bill-editor { display: none !important; }
+
+  .bill-print { display: block !important; }
+
+  body { background: #fff; color: #000; font-family: Arial, sans-serif; }
+}
+
+.print-doc { color: #000; font-family: Arial, sans-serif; font-size: 13px; padding: 20px; }
+
+.print-doc-title { font-size: 22px; font-weight: bold; margin-bottom: 4px; }
+
+.print-doc-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  margin-bottom: 28px;
+  border-bottom: 2px solid #000;
+  padding-bottom: 10px;
+}
+
+.print-room { margin-bottom: 20px; }
+
+.print-room-name {
+  border-bottom: 1px solid #000;
+  font-size: 13px;
+  font-weight: bold;
+  margin-bottom: 6px;
+  padding-bottom: 2px;
+}
+
+.print-table { border-collapse: collapse; font-size: 12px; margin-bottom: 4px; width: 100%; }
+
+.print-table th {
+  border-bottom: 1px solid #ccc;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 8px;
+  text-align: left;
+}
+
+.print-table td { padding: 3px 8px; }
+.print-table td:nth-child(3),
+.print-table td:nth-child(4),
+.print-table td:nth-child(5) { text-align: right; }
+
+.print-room-subtotal {
+  border-top: 1px solid #ccc;
+  font-size: 12px;
+  font-weight: bold;
+  margin-top: 2px;
+  padding-top: 3px;
+  text-align: right;
+}
+
+.print-totals {
+  border-top: 2px solid #000;
+  margin-left: auto;
+  margin-top: 24px;
+  max-width: 260px;
+  padding-top: 10px;
+}
+
+.print-total-row { display: flex; font-size: 13px; justify-content: space-between; padding: 3px 0; }
+.print-total-row.grand { border-bottom: 1px solid #000; border-top: 1px solid #000; font-weight: bold; margin: 4px 0; padding: 5px 0; }
+.print-total-row.balance { border-top: 1px solid #000; font-weight: bold; margin-top: 4px; padding-top: 5px; }
