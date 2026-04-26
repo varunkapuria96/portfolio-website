@@ -2,6 +2,12 @@ function fmt(n) {
   return (n || 0).toLocaleString('en-IN')
 }
 
+function isoToDisplay(iso) {
+  if (!iso) return ''
+  const [y, m, d] = iso.split('-')
+  return `${d}/${m}/${y}`
+}
+
 export default function BillPrint({ bill, rooms, roomsSubtotal, grandTotal, balanceDue, company }) {
   if (!bill) return null
 
@@ -19,7 +25,7 @@ export default function BillPrint({ bill, rooms, roomsSubtotal, grandTotal, bala
         <div className="print-doc-title">Estimate</div>
         <div className="print-doc-meta">
           <span><strong>{bill.customer_name || 'Customer'}</strong></span>
-          <span>{bill.date}</span>
+          <span>{isoToDisplay(bill.date)}</span>
         </div>
 
         {rooms.map(room => (

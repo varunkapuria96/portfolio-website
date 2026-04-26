@@ -6,6 +6,18 @@ function fmt(n) {
   return (n || 0).toLocaleString('en-IN')
 }
 
+function isoToDisplay(iso) {
+  if (!iso) return ''
+  const [y, m, d] = iso.split('-')
+  return `${d}/${m}/${y}`
+}
+
+function displayToISO(display) {
+  if (!display) return ''
+  const [d, m, y] = display.split('/')
+  return `${y}-${m}-${d}`
+}
+
 export default function BillEditor({ session, billId, onBack }) {
   const [bill, setBill] = useState(null)
   const [rooms, setRooms] = useState([])
@@ -133,10 +145,11 @@ export default function BillEditor({ session, billId, onBack }) {
             onBlur={e => saveBillField('customer_name', e.target.value)}
           />
           <input
-            type="date"
+            type="text"
             className="bill-date-input"
-            defaultValue={bill.date}
-            onBlur={e => saveBillField('date', e.target.value)}
+            placeholder="DD/MM/YYYY"
+            defaultValue={isoToDisplay(bill.date)}
+            onBlur={e => saveBillField('date', displayToISO(e.target.value))}
           />
         </div>
 

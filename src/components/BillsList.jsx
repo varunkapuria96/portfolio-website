@@ -1,6 +1,12 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../supabase'
 
+function isoToDisplay(iso) {
+  if (!iso) return ''
+  const [y, m, d] = iso.split('-')
+  return `${d}/${m}/${y}`
+}
+
 export default function BillsList({ session, onEdit }) {
   const [bills, setBills] = useState([])
   const [loading, setLoading] = useState(true)
@@ -59,7 +65,7 @@ export default function BillsList({ session, onEdit }) {
             {bills.map(bill => (
               <tr key={bill.id} onClick={() => onEdit(bill.id)}>
                 <td>{bill.customer_name || <span style={{ color: '#444' }}>Untitled</span>}</td>
-                <td>{bill.date}</td>
+                <td>{isoToDisplay(bill.date)}</td>
                 <td>
                   <button
                     className="action-btn"
