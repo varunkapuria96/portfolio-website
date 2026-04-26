@@ -59,6 +59,15 @@ const PROJECTS = [
     href: '/projects/todo',
   },
   {
+    id: 'bills',
+    lang: 'JavaScript',
+    name: 'Bill Generator',
+    desc: 'Billing and estimate app for a curtain tailor — room-by-room line items, auto-totals, and print-ready PDF output.',
+    tags: ['React', 'Supabase', 'Vite'],
+    live: true,
+    href: '/projects/bills',
+  },
+  {
     id: 'btc',
     lang: 'Python',
     name: 'BTC Prediction',
