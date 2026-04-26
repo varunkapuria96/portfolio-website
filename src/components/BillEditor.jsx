@@ -180,10 +180,10 @@ export default function BillEditor({ session, billId, onBack }) {
                           const qty = parseFloat(e.target.value) || 0
                           updateItemLocally(room.id, item.id, { quantity: qty, total: qty * item.price })
                         }}
-                        onBlur={e => {
+                        onBlur={async e => {
                           const qty = parseFloat(e.target.value) || 0
                           const total = qty * item.price
-                          supabase.from('bill_items').update({ quantity: qty, total }).eq('id', item.id)
+                          await supabase.from('bill_items').update({ quantity: qty, total }).eq('id', item.id)
                         }}
                       />
                     </td>
@@ -195,10 +195,10 @@ export default function BillEditor({ session, billId, onBack }) {
                           const rate = parseFloat(e.target.value) || 0
                           updateItemLocally(room.id, item.id, { price: rate, total: item.quantity * rate })
                         }}
-                        onBlur={e => {
+                        onBlur={async e => {
                           const rate = parseFloat(e.target.value) || 0
                           const total = item.quantity * rate
-                          supabase.from('bill_items').update({ price: rate, total }).eq('id', item.id)
+                          await supabase.from('bill_items').update({ price: rate, total }).eq('id', item.id)
                         }}
                       />
                     </td>
