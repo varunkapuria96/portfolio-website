@@ -67,6 +67,24 @@ body {
   color: #4f46e5;
 }
 
+.nav-auth-btn {
+  background: #4f46e5;
+  border: none;
+  border-radius: 4px;
+  color: #ffffff;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  padding: 5px 14px;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.nav-auth-btn:hover {
+  background: #4338ca;
+  color: #ffffff;
+}
+
 /* ===== HERO ===== */
 .hero {
   padding: 80px 40px 60px;

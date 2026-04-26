@@ -1,7 +1,14 @@
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { supabase } from '../supabase'
 
-export default function Nav() {
+export default function Nav({ session }) {
   const { pathname } = useLocation()
+  const navigate = useNavigate()
+
+  async function handleSignOut() {
+    await supabase.auth.signOut()
+    navigate('/')
+  }
 
   return (
     <nav className="nav" aria-label="Main navigation">
@@ -22,6 +29,11 @@ export default function Nav() {
         <a href="mailto:me@varunkapuria.xyz" className="nav-cta">
           me@varunkapuria.xyz
         </a>
+        {session === undefined ? null : session ? (
+          <button className="nav-auth-btn" onClick={handleSignOut}>sign out</button>
+        ) : (
+          <Link to="/projects/bills" className="nav-auth-btn">sign in</Link>
+        )}
       </div>
     </nav>
   )

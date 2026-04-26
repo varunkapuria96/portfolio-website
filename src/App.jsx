@@ -57,9 +57,17 @@ export function BillRoute() {
 }
 
 export default function App() {
+  const [session, setSession] = useState(undefined)
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => setSession(session))
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => setSession(session))
+    return () => subscription.unsubscribe()
+  }, [])
+
   return (
     <BrowserRouter>
-      <Nav />
+      <Nav session={session} />
       <Routes>
         <Route path="/" element={<Portfolio />} />
         <Route path="/projects/todo" element={<TodoRoute />} />
