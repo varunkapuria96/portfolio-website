@@ -44,7 +44,7 @@ export default function BillsApp({ session }) {
           <BillsList session={session} onEdit={handleEdit} />
         )}
         {tab === 'bills' && editingBillId && (
-          <BillEditor session={session} billId={editingBillId} onBack={handleBack} />
+          <BillEditor key={editingBillId} session={session} billId={editingBillId} onBack={handleBack} />
         )}
         {tab === 'rooms' && <ManageRooms session={session} />}
         {tab === 'products' && <ManageProducts session={session} />}

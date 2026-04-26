@@ -22,7 +22,7 @@ export default function BillEditor({ session, billId, onBack }) {
           supabase.from('products').select('*').order('created_at', { ascending: true }),
         ])
       if (billData) setBill(billData)
-      if (roomsData) setRooms(roomsData.map(r => ({ ...r, items: r.bill_items || [] })))
+      if (roomsData) setRooms(roomsData.map(({ bill_items, ...r }) => ({ ...r, items: bill_items || [] })))
       if (avRooms) setAvailableRooms(avRooms)
       if (avProducts) setAvailableProducts(avProducts)
     }
