@@ -2,12 +2,20 @@ function fmt(n) {
   return (n || 0).toLocaleString('en-IN')
 }
 
-export default function BillPrint({ bill, rooms, roomsSubtotal, grandTotal, balanceDue }) {
+export default function BillPrint({ bill, rooms, roomsSubtotal, grandTotal, balanceDue, company }) {
   if (!bill) return null
 
   return (
     <div className="bill-print">
       <div className="print-doc">
+        {company?.header && (
+          <div className="print-company">
+            <div className="print-company-header">{company.header}</div>
+            {company.subheader && (
+              <div className="print-company-subheader">{company.subheader}</div>
+            )}
+          </div>
+        )}
         <div className="print-doc-title">Estimate</div>
         <div className="print-doc-meta">
           <span><strong>{bill.customer_name || 'Customer'}</strong></span>
@@ -21,8 +29,8 @@ export default function BillPrint({ bill, rooms, roomsSubtotal, grandTotal, bala
               <thead>
                 <tr>
                   <th>Product</th>
-                  <th>Unit</th>
                   <th>Qty</th>
+                  <th>Unit</th>
                   <th>Rate</th>
                   <th>Amount</th>
                 </tr>
@@ -31,8 +39,8 @@ export default function BillPrint({ bill, rooms, roomsSubtotal, grandTotal, bala
                 {room.items.map(item => (
                   <tr key={item.id}>
                     <td>{item.product_name}</td>
-                    <td>{item.unit}</td>
                     <td>{item.quantity}</td>
+                    <td>{item.unit}</td>
                     <td>{fmt(item.price)}</td>
                     <td>{fmt(item.total)}</td>
                   </tr>

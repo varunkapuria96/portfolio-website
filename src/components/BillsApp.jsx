@@ -3,6 +3,7 @@ import BillsList from './BillsList'
 import BillEditor from './BillEditor'
 import ManageRooms from './ManageRooms'
 import ManageProducts from './ManageProducts'
+import ManageCompany from './ManageCompany'
 
 export default function BillsApp({ session }) {
   const [tab, setTab] = useState('bills')
@@ -37,6 +38,12 @@ export default function BillsApp({ session }) {
         >
           Manage Products
         </button>
+        <button
+          className={tab === 'company' ? 'active' : ''}
+          onClick={() => setTab('company')}
+        >
+          Company
+        </button>
       </div>
 
       <div className="bills-content">
@@ -48,6 +55,7 @@ export default function BillsApp({ session }) {
         )}
         {tab === 'rooms' && <ManageRooms session={session} />}
         {tab === 'products' && <ManageProducts session={session} />}
+        {tab === 'company' && <ManageCompany session={session} />}
       </div>
     </div>
   )

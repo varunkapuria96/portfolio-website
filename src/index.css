@@ -1152,6 +1152,35 @@ body {
 
 .manage-add-btn:hover { border-color: #00ff88; }
 
+/* Manage Company */
+.manage-company { }
+.manage-company-hint { color: #555; font-size: 12px; margin-bottom: 24px; margin-top: -8px; }
+.manage-company-fields { display: flex; flex-direction: column; gap: 20px; }
+.manage-company-label { color: #888; display: flex; flex-direction: column; font-size: 11px; gap: 6px; letter-spacing: 0.5px; text-transform: uppercase; }
+.manage-company-input {
+  background: #111;
+  border: 1px solid #222;
+  border-radius: 4px;
+  color: #e0e0e0;
+  font-family: inherit;
+  font-size: 14px;
+  padding: 8px 10px;
+  width: 100%;
+}
+.manage-company-input:focus { border-color: #00ff88; outline: none; }
+.manage-company-textarea {
+  background: #111;
+  border: 1px solid #222;
+  border-radius: 4px;
+  color: #e0e0e0;
+  font-family: inherit;
+  font-size: 13px;
+  padding: 8px 10px;
+  resize: vertical;
+  width: 100%;
+}
+.manage-company-textarea:focus { border-color: #00ff88; outline: none; }
+
 /* Products table */
 .products-table {
   width: 100%;
@@ -1365,14 +1394,21 @@ body {
   font-family: inherit;
   font-size: 12px;
   padding: 3px 6px;
-  text-align: right;
+  text-align: center;
   width: 80px;
 }
 
 .bill-items-table input[type="number"]:focus { border-color: #00ff88; outline: none; }
 
+.bill-items-table th:nth-child(3),
+.bill-items-table th:nth-child(4),
+.bill-items-table th:nth-child(5),
+.bill-items-table td:nth-child(3),
+.bill-items-table td:nth-child(4),
+.bill-items-table td:nth-child(5) { text-align: center; }
+
 .item-unit { color: #555; font-size: 11px; }
-.item-total { color: #00ff88; text-align: right; }
+.item-total { color: #00ff88; }
 
 .item-delete-btn {
   background: none;
@@ -1489,6 +1525,10 @@ body {
 
 .print-doc { color: #000; font-family: Arial, sans-serif; font-size: 13px; padding: 20px; }
 
+.print-company { margin-bottom: 16px; text-align: center; }
+.print-company-header { font-size: 20px; font-weight: bold; letter-spacing: 0.5px; }
+.print-company-subheader { font-size: 11px; color: #444; margin-top: 4px; white-space: pre-wrap; }
+
 .print-doc-title { font-size: 22px; font-weight: bold; margin-bottom: 4px; }
 
 .print-doc-meta {
@@ -1521,6 +1561,9 @@ body {
 }
 
 .print-table td { padding: 3px 8px; }
+.print-table th:nth-child(3),
+.print-table th:nth-child(4),
+.print-table th:nth-child(5),
 .print-table td:nth-child(3),
 .print-table td:nth-child(4),
 .print-table td:nth-child(5) { text-align: right; }

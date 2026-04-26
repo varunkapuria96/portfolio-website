@@ -11,20 +11,23 @@ export default function BillEditor({ session, billId, onBack }) {
   const [rooms, setRooms] = useState([])
   const [availableRooms, setAvailableRooms] = useState([])
   const [availableProducts, setAvailableProducts] = useState([])
+  const [company, setCompany] = useState(null)
 
   useEffect(() => {
     async function load() {
-      const [{ data: billData }, { data: roomsData }, { data: avRooms }, { data: avProducts }] =
+      const [{ data: billData }, { data: roomsData }, { data: avRooms }, { data: avProducts }, { data: companyData }] =
         await Promise.all([
           supabase.from('bills').select('*').eq('id', billId).single(),
           supabase.from('bill_rooms').select('*, bill_items(*)').eq('bill_id', billId).order('sort_order'),
           supabase.from('rooms').select('*').order('created_at', { ascending: true }),
           supabase.from('products').select('*').order('created_at', { ascending: true }),
+          supabase.from('company_info').select('*').eq('user_id', session.user.id).maybeSingle(),
         ])
       if (billData) setBill(billData)
       if (roomsData) setRooms(roomsData.map(({ bill_items, ...r }) => ({ ...r, items: bill_items || [] })))
       if (avRooms) setAvailableRooms(avRooms)
       if (avProducts) setAvailableProducts(avProducts)
+      setCompany(companyData || { header: '', subheader: '' })
     }
     load()
   }, [billId])
@@ -150,8 +153,8 @@ export default function BillEditor({ session, billId, onBack }) {
               <thead>
                 <tr>
                   <th>Product</th>
-                  <th>Unit</th>
                   <th>Qty</th>
+                  <th>Unit</th>
                   <th>Rate</th>
                   <th>Amount</th>
                   <th></th>
@@ -171,7 +174,6 @@ export default function BillEditor({ session, billId, onBack }) {
                         ))}
                       </select>
                     </td>
-                    <td><span className="item-unit">{item.unit || '—'}</span></td>
                     <td>
                       <input
                         type="number"
@@ -187,6 +189,7 @@ export default function BillEditor({ session, billId, onBack }) {
                         }}
                       />
                     </td>
+                    <td><span className="item-unit">{item.unit || '—'}</span></td>
                     <td>
                       <input
                         type="number"
@@ -285,6 +288,7 @@ export default function BillEditor({ session, billId, onBack }) {
         roomsSubtotal={roomsSubtotal}
         grandTotal={grandTotal}
         balanceDue={balanceDue}
+        company={company}
       />
     </>
   )

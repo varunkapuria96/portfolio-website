@@ -40,6 +40,7 @@ function makeChain(overrides = {}) {
     eq: vi.fn().mockReturnThis(),
     order: vi.fn().mockResolvedValue({ data: [] }),
     single: vi.fn().mockResolvedValue({ data: null }),
+    maybeSingle: vi.fn().mockResolvedValue({ data: null }),
     ...overrides,
   }
 }
@@ -58,6 +59,9 @@ beforeEach(() => {
     }
     if (table === 'products') {
       return makeChain({ order: vi.fn().mockResolvedValue({ data: mockAvailableProducts }) })
+    }
+    if (table === 'company_info') {
+      return makeChain({ maybeSingle: vi.fn().mockResolvedValue({ data: { header: 'Acme Co', subheader: '' } }) })
     }
     return makeChain()
   })
