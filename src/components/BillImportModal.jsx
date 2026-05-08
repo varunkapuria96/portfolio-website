@@ -51,8 +51,11 @@ export default function BillImportModal({ status, extractedRooms, errorMessage, 
 
   async function handleConfirm() {
     setIsSubmitting(true)
-    await onConfirm(rooms)
-    setIsSubmitting(false)
+    try {
+      await onConfirm(rooms)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
