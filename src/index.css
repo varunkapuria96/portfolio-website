@@ -1827,6 +1827,9 @@ body {
   .bill-print { display: block !important; }
 
   body { background: #fff; color: #000; font-family: Arial, sans-serif; }
+
+  .print-room + .print-room,
+  .print-totals { break-before: page; }
 }
 
 .print-doc { color: #000; font-family: Arial, sans-serif; font-size: 13px; padding: 20px; }
