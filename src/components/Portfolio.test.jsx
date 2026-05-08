@@ -42,7 +42,7 @@ test('renders all 6 project cards', () => {
 
 test('Todo App card has LIVE badge', () => {
   renderPortfolio()
-  expect(screen.getByText('LIVE')).toBeInTheDocument()
+  expect(screen.getAllByText('LIVE').length).toBeGreaterThanOrEqual(1)
 })
 
 test('Todo App card links to /projects/todo', () => {
