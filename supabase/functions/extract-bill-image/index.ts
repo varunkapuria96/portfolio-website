@@ -50,8 +50,8 @@ ${productList || '(none)'}
 
 Rules:
 - For each item, if the product name closely matches a catalogue entry (case-insensitive, partial match is fine), use the catalogue entry's unit and price and set matched: true
-- If no catalogue match, set unit to empty string, price to 0, matched: false
-- If quantity is not visible or unclear, use 0
+- If no catalogue match, extract the unit and price directly from the image and set matched: false
+- If quantity, unit, or price is not visible or unclear, use 0 for numbers and empty string for unit
 - If no rooms or items can be found, call the tool with an empty rooms array`
 
     const response = await client.messages.create({

@@ -11,7 +11,7 @@ function withKeys(rooms) {
   }))
 }
 
-export default function BillImportModal({ status, extractedRooms, errorMessage, onConfirm, onClose, onRetry }) {
+export default function BillImportModal({ status, extractedRooms, errorMessage, onConfirm, onClose, onRetry, availableRooms = [], availableProducts = [], onAddRoom, onAddProduct }) {
   const [rooms, setRooms] = useState(() => withKeys(extractedRooms))
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -90,7 +90,9 @@ export default function BillImportModal({ status, extractedRooms, errorMessage, 
                 <p className="import-hint">
                   Review and edit before adding to bill. Highlighted items weren't matched to your catalogue.
                 </p>
-                {rooms.map((room, roomIdx) => (
+                {rooms.map((room, roomIdx) => {
+                  const roomInCatalogue = availableRooms.some(r => r.name.toLowerCase() === room.name.toLowerCase())
+                  return (
                   <div key={room._key} className="import-room">
                     <div className="import-room-header">
                       <input
@@ -103,23 +105,45 @@ export default function BillImportModal({ status, extractedRooms, errorMessage, 
                         Remove room
                       </button>
                     </div>
+                    {!roomInCatalogue && room.name && (
+                      <div className="import-unmatched-hint import-unmatched-room">
+                        ⚠ "{room.name}" isn't in your rooms catalogue —{' '}
+                        {onAddRoom && (
+                          <button className="import-add-to-catalogue-btn" onClick={() => onAddRoom(room.name)}>
+                            Add room to catalogue
+                          </button>
+                        )}
+                      </div>
+                    )}
                     <div className="import-item-grid">
                       <span className="import-col-header">Product</span>
                       <span className="import-col-header">Qty</span>
                       <span className="import-col-header">Unit</span>
                       <span className="import-col-header">Rate</span>
                       <span />
-                      {room.items.map((item, itemIdx) => (
+                      {room.items.map((item, itemIdx) => {
+                        const productInCatalogue = availableProducts.some(p => p.name.toLowerCase() === item.product_name.toLowerCase())
+                        return (
                         <Fragment key={item._key}>
                           <div>
                             <input
-                              className={`import-item-input${item.matched === false ? ' unmatched' : ''}`}
+                              className={`import-item-input${!productInCatalogue && item.product_name ? ' unmatched' : ''}`}
                               value={item.product_name}
                               onChange={e => updateItem(roomIdx, itemIdx, 'product_name', e.target.value)}
                               aria-label="Product name"
                             />
-                            {item.matched === false && (
-                              <div className="import-unmatched-hint">⚠ Not in catalogue — edit or remove</div>
+                            {!productInCatalogue && item.product_name && (
+                              <div className="import-unmatched-hint">
+                                ⚠ Not in catalogue —{' '}
+                                {onAddProduct && (
+                                  <button
+                                    className="import-add-to-catalogue-btn"
+                                    onClick={() => onAddProduct(item.product_name, item.unit, item.price)}
+                                  >
+                                    Add to catalogue
+                                  </button>
+                                )}
+                              </div>
                             )}
                           </div>
                           <input
@@ -148,11 +172,12 @@ export default function BillImportModal({ status, extractedRooms, errorMessage, 
                             aria-label="Remove item"
                           >×</button>
                         </Fragment>
-                      ))}
+                        )})}
                     </div>
                     <button className="import-add-item" onClick={() => addItem(roomIdx)}>+ Add item</button>
                   </div>
-                ))}
+                  )
+                })}
               </>
             )
           )}

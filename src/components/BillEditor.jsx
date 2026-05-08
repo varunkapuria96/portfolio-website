@@ -169,6 +169,24 @@ export default function BillEditor({ session, billId, onBack }) {
     setImportStatus('review')
   }
 
+  async function addRoomToCatalogue(name) {
+    const { data } = await supabase
+      .from('rooms')
+      .insert({ name, user_id: session.user.id })
+      .select()
+      .single()
+    if (data) setAvailableRooms(prev => [...prev, data])
+  }
+
+  async function addProductToCatalogue(name, unit, price) {
+    const { data } = await supabase
+      .from('products')
+      .insert({ name, unit: unit || '', price: price || 0, user_id: session.user.id })
+      .select()
+      .single()
+    if (data) setAvailableProducts(prev => [...prev, data])
+  }
+
   async function addImportedRooms(extractedRooms) {
     if (!extractedRooms.length) {
       setImportModalOpen(false)
@@ -431,6 +449,10 @@ export default function BillEditor({ session, billId, onBack }) {
           status={importStatus}
           extractedRooms={importExtracted}
           errorMessage={importError}
+          availableRooms={availableRooms}
+          availableProducts={availableProducts}
+          onAddRoom={addRoomToCatalogue}
+          onAddProduct={addProductToCatalogue}
           onConfirm={addImportedRooms}
           onClose={() => setImportModalOpen(false)}
           onRetry={() => fileInputRef.current?.click()}

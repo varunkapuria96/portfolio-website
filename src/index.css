@@ -1789,6 +1789,27 @@ body {
   margin-top: 4px;
 }
 
+.import-unmatched-room {
+  margin-bottom: 8px;
+}
+
+.import-add-to-catalogue-btn {
+  background: none;
+  border: 1px solid #ffaa44;
+  border-radius: 3px;
+  color: #ffaa44;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 10px;
+  padding: 2px 8px;
+  margin-left: 4px;
+}
+
+.import-add-to-catalogue-btn:hover {
+  background: #ffaa44;
+  color: #000;
+}
+
 /* ===== PRINT STYLES ===== */
 .bill-print { display: none; }
 

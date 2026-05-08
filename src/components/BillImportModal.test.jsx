@@ -60,11 +60,12 @@ describe('BillImportModal', () => {
     expect(screen.getByDisplayValue('blackout lining')).toBeInTheDocument()
   })
 
-  it('applies unmatched class to items with matched: false', () => {
+  it('applies unmatched class to items not in availableProducts', () => {
     render(
       <BillImportModal
         status="review"
         extractedRooms={sampleRooms}
+        availableProducts={[{ id: 'p1', name: 'Roman Blind', unit: 'sqft', price: 850 }]}
         onConfirm={vi.fn()}
         onClose={vi.fn()}
         onRetry={vi.fn()}
