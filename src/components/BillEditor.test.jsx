@@ -95,4 +95,10 @@ describe('BillEditor', () => {
     await userEvent.click(screen.getByRole('button', { name: /← bills/i }))
     expect(onBack).toHaveBeenCalled()
   })
+
+  it('renders Import from image button in nav', async () => {
+    render(<BillEditor session={mockSession} billId="b1" onBack={vi.fn()} />)
+    await screen.findByDisplayValue('Tanay Mehta')
+    expect(screen.getByRole('button', { name: /import from image/i })).toBeInTheDocument()
+  })
 })

@@ -1,11 +1,19 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../supabase'
 import BillPrint from './BillPrint'
+import BillImportModal from './BillImportModal'
 
 function fmt(n) {
   return (n || 0).toLocaleString('en-IN')
 }
 
+function fileToBase64(file) {
+  return new Promise((resolve) => {
+    const reader = new FileReader()
+    reader.onload = (e) => resolve(e.target.result.split(',')[1])
+    reader.readAsDataURL(file)
+  })
+}
 
 export default function BillEditor({ session, billId, onBack }) {
   const [bill, setBill] = useState(null)
@@ -13,6 +21,13 @@ export default function BillEditor({ session, billId, onBack }) {
   const [availableRooms, setAvailableRooms] = useState([])
   const [availableProducts, setAvailableProducts] = useState([])
   const [company, setCompany] = useState(null)
+
+  const [importModalOpen, setImportModalOpen] = useState(false)
+  const [importStatus, setImportStatus] = useState('loading')
+  const [importExtracted, setImportExtracted] = useState([])
+  const [importError, setImportError] = useState('')
+  const [importFileError, setImportFileError] = useState('')
+  const fileInputRef = useRef(null)
 
   useEffect(() => {
     async function load() {
@@ -116,6 +131,76 @@ export default function BillEditor({ session, billId, onBack }) {
     })
   }
 
+  async function handleImageFile(file) {
+    if (file.size > 5 * 1024 * 1024) {
+      setImportFileError('Image must be under 5MB')
+      return
+    }
+    setImportFileError('')
+    setImportModalOpen(true)
+    setImportStatus('loading')
+    setImportError('')
+    setImportExtracted([])
+
+    const base64 = await fileToBase64(file)
+    const { data, error } = await supabase.functions.invoke('extract-bill-image', {
+      body: {
+        image_base64: base64,
+        media_type: file.type,
+        products: availableProducts.map(p => ({ name: p.name, unit: p.unit, price: p.price })),
+      },
+    })
+
+    if (error || data?.error || !Array.isArray(data?.rooms)) {
+      setImportStatus('error')
+      setImportError(data?.error || 'Failed to process image')
+      return
+    }
+
+    setImportExtracted(data.rooms)
+    setImportStatus('review')
+  }
+
+  async function addImportedRooms(extractedRooms) {
+    for (const extracted of extractedRooms) {
+      const matchedRoom = availableRooms.find(
+        r => r.name.toLowerCase() === extracted.name.toLowerCase()
+      )
+      const { data: billRoom } = await supabase
+        .from('bill_rooms')
+        .insert({
+          bill_id: billId,
+          room_id: matchedRoom?.id || null,
+          room_name: extracted.name,
+          sort_order: rooms.length,
+        })
+        .select()
+        .single()
+
+      if (!billRoom) continue
+
+      const items = []
+      for (const item of extracted.items) {
+        const { data: billItem } = await supabase
+          .from('bill_items')
+          .insert({
+            bill_room_id: billRoom.id,
+            product_name: item.product_name,
+            unit: item.unit,
+            quantity: item.quantity,
+            price: item.price,
+            total: item.quantity * item.price,
+          })
+          .select()
+          .single()
+        if (billItem) items.push(billItem)
+      }
+
+      setRooms(prev => [...prev, { ...billRoom, items }])
+    }
+    setImportModalOpen(false)
+  }
+
   if (!bill) return null
 
   return (
@@ -123,7 +208,25 @@ export default function BillEditor({ session, billId, onBack }) {
       <div className="bill-editor">
         <div className="bill-editor-nav">
           <button className="back-btn" onClick={onBack}>← Bills</button>
-          <button className="print-btn" onClick={() => window.print()}>Print / Save PDF</button>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <div>
+              <button
+                className="import-btn"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                Import from image
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={e => { if (e.target.files?.[0]) handleImageFile(e.target.files[0]); e.target.value = '' }}
+              />
+              {importFileError && <div className="import-file-error">{importFileError}</div>}
+            </div>
+            <button className="print-btn" onClick={() => window.print()}>Print / Save PDF</button>
+          </div>
         </div>
 
         <div className="bill-header-fields">
@@ -291,6 +394,17 @@ export default function BillEditor({ session, billId, onBack }) {
         balanceDue={balanceDue}
         company={company}
       />
+
+      {importModalOpen && (
+        <BillImportModal
+          status={importStatus}
+          extractedRooms={importExtracted}
+          errorMessage={importError}
+          onConfirm={addImportedRooms}
+          onClose={() => setImportModalOpen(false)}
+          onRetry={() => fileInputRef.current?.click()}
+        />
+      )}
     </>
   )
 }
