@@ -8,9 +8,10 @@ function fmt(n) {
 }
 
 function fileToBase64(file) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.onload = (e) => resolve(e.target.result.split(',')[1])
+    reader.onerror = () => reject(new Error('Could not read file'))
     reader.readAsDataURL(file)
   })
 }
@@ -142,7 +143,14 @@ export default function BillEditor({ session, billId, onBack }) {
     setImportError('')
     setImportExtracted([])
 
-    const base64 = await fileToBase64(file)
+    let base64
+    try {
+      base64 = await fileToBase64(file)
+    } catch {
+      setImportStatus('error')
+      setImportError('Could not read the image file. Please try again.')
+      return
+    }
     const { data, error } = await supabase.functions.invoke('extract-bill-image', {
       body: {
         image_base64: base64,
@@ -162,29 +170,45 @@ export default function BillEditor({ session, billId, onBack }) {
   }
 
   async function addImportedRooms(extractedRooms) {
+    if (!extractedRooms.length) {
+      setImportModalOpen(false)
+      return
+    }
+    let nextSortOrder = rooms.length
+    let insertedCount = 0
+
     for (const extracted of extractedRooms) {
       const matchedRoom = availableRooms.find(
         r => r.name.toLowerCase() === extracted.name.toLowerCase()
       )
-      const { data: billRoom } = await supabase
+      const { data: billRoom, error: roomError } = await supabase
         .from('bill_rooms')
         .insert({
           bill_id: billId,
           room_id: matchedRoom?.id || null,
           room_name: extracted.name,
-          sort_order: rooms.length,
+          sort_order: nextSortOrder,
         })
         .select()
         .single()
 
-      if (!billRoom) continue
+      if (roomError || !billRoom) {
+        console.error('Failed to insert room:', extracted.name, roomError)
+        continue
+      }
+      nextSortOrder++
+      insertedCount++
 
       const items = []
       for (const item of extracted.items) {
-        const { data: billItem } = await supabase
+        const matchedProduct = availableProducts.find(
+          p => p.name.toLowerCase() === item.product_name.toLowerCase()
+        )
+        const { data: billItem, error: itemError } = await supabase
           .from('bill_items')
           .insert({
             bill_room_id: billRoom.id,
+            product_id: matchedProduct?.id || null,
             product_name: item.product_name,
             unit: item.unit,
             quantity: item.quantity,
@@ -193,10 +217,17 @@ export default function BillEditor({ session, billId, onBack }) {
           })
           .select()
           .single()
+        if (itemError) console.error('Failed to insert item:', item.product_name, itemError)
         if (billItem) items.push(billItem)
       }
 
       setRooms(prev => [...prev, { ...billRoom, items }])
+    }
+
+    if (insertedCount < extractedRooms.length) {
+      setImportStatus('error')
+      setImportError(`${extractedRooms.length - insertedCount} room(s) failed to save. Check your connection and try again.`)
+      return
     }
     setImportModalOpen(false)
   }
