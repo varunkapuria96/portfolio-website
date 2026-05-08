@@ -1,10 +1,22 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect, Fragment } from 'react'
+
+function withKeys(rooms) {
+  return (rooms || []).map(r => ({
+    ...r,
+    _key: r._key || crypto.randomUUID(),
+    items: (r.items || []).map(item => ({
+      ...item,
+      _key: item._key || crypto.randomUUID(),
+    })),
+  }))
+}
 
 export default function BillImportModal({ status, extractedRooms, errorMessage, onConfirm, onClose, onRetry }) {
-  const [rooms, setRooms] = useState(extractedRooms || [])
+  const [rooms, setRooms] = useState(() => withKeys(extractedRooms))
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
-    setRooms(extractedRooms || [])
+    setRooms(withKeys(extractedRooms))
   }, [extractedRooms])
 
   function updateRoomName(roomIdx, value) {
@@ -32,9 +44,15 @@ export default function BillImportModal({ status, extractedRooms, errorMessage, 
   function addItem(roomIdx) {
     setRooms(prev => prev.map((r, i) =>
       i === roomIdx
-        ? { ...r, items: [...r.items, { product_name: '', quantity: 0, unit: '', price: 0, matched: true }] }
+        ? { ...r, items: [...r.items, { product_name: '', quantity: 0, unit: '', price: 0, matched: true, _key: crypto.randomUUID() }] }
         : r
     ))
+  }
+
+  async function handleConfirm() {
+    setIsSubmitting(true)
+    await onConfirm(rooms)
+    setIsSubmitting(false)
   }
 
   return (
@@ -70,7 +88,7 @@ export default function BillImportModal({ status, extractedRooms, errorMessage, 
                   Review and edit before adding to bill. Highlighted items weren't matched to your catalogue.
                 </p>
                 {rooms.map((room, roomIdx) => (
-                  <div key={roomIdx} className="import-room">
+                  <div key={room._key} className="import-room">
                     <div className="import-room-header">
                       <input
                         className="import-room-name"
@@ -89,7 +107,7 @@ export default function BillImportModal({ status, extractedRooms, errorMessage, 
                       <span className="import-col-header">Rate</span>
                       <span />
                       {room.items.map((item, itemIdx) => (
-                        <React.Fragment key={itemIdx}>
+                        <Fragment key={item._key}>
                           <div>
                             <input
                               className={`import-item-input${item.matched === false ? ' unmatched' : ''}`}
@@ -126,7 +144,7 @@ export default function BillImportModal({ status, extractedRooms, errorMessage, 
                             onClick={() => removeItem(roomIdx, itemIdx)}
                             aria-label="Remove item"
                           >×</button>
-                        </React.Fragment>
+                        </Fragment>
                       ))}
                     </div>
                     <button className="import-add-item" onClick={() => addItem(roomIdx)}>+ Add item</button>
@@ -141,8 +159,8 @@ export default function BillImportModal({ status, extractedRooms, errorMessage, 
           <button className="import-cancel-btn" onClick={onClose}>Cancel</button>
           <button
             className="import-add-btn"
-            onClick={() => onConfirm(rooms)}
-            disabled={status !== 'review'}
+            onClick={handleConfirm}
+            disabled={status !== 'review' || isSubmitting}
           >
             Add to Bill
           </button>

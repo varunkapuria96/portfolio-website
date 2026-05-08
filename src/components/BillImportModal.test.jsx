@@ -75,7 +75,7 @@ describe('BillImportModal', () => {
   })
 
   it('calls onConfirm with current rooms when Add to Bill is clicked', async () => {
-    const onConfirm = vi.fn()
+    const onConfirm = vi.fn().mockResolvedValue(undefined)
     render(
       <BillImportModal
         status="review"
@@ -90,6 +90,26 @@ describe('BillImportModal', () => {
       expect.arrayContaining([
         expect.objectContaining({ name: 'Living Room' }),
       ])
+    )
+  })
+
+  it('passes edited room name to onConfirm', async () => {
+    const onConfirm = vi.fn().mockResolvedValue(undefined)
+    render(
+      <BillImportModal
+        status="review"
+        extractedRooms={sampleRooms}
+        onConfirm={onConfirm}
+        onClose={vi.fn()}
+        onRetry={vi.fn()}
+      />
+    )
+    const roomInput = screen.getByDisplayValue('Living Room')
+    await userEvent.clear(roomInput)
+    await userEvent.type(roomInput, 'Master Bedroom')
+    await userEvent.click(screen.getByRole('button', { name: /add to bill/i }))
+    expect(onConfirm).toHaveBeenCalledWith(
+      expect.arrayContaining([expect.objectContaining({ name: 'Master Bedroom' })])
     )
   })
 
