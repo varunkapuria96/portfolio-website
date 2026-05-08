@@ -43,38 +43,57 @@ Deno.serve(async (req) => {
       .map((p: { name: string; unit: string; price: number }) => `- ${p.name} (unit: ${p.unit}, price: ${p.price})`)
       .join('\n')
 
-    const prompt = `This is a handwritten site visit note for a curtain tailor. Extract all rooms and their associated products/items.
+    const userPrompt = `This is a handwritten site visit note for a curtain tailor. Extract all rooms and their associated products/items using the extract_bill_data tool.
 
 Known products catalogue:
 ${productList || '(none)'}
-
-Return ONLY valid JSON in this exact format, no other text:
-{
-  "rooms": [
-    {
-      "name": "room name",
-      "items": [
-        {
-          "product_name": "product name",
-          "quantity": 0,
-          "unit": "unit string",
-          "price": 0,
-          "matched": true
-        }
-      ]
-    }
-  ]
-}
 
 Rules:
 - For each item, if the product name closely matches a catalogue entry (case-insensitive, partial match is fine), use the catalogue entry's unit and price and set matched: true
 - If no catalogue match, set unit to empty string, price to 0, matched: false
 - If quantity is not visible or unclear, use 0
-- If no rooms or items can be found in the image, return { "rooms": [] }`
+- If no rooms or items can be found, call the tool with an empty rooms array`
 
     const response = await client.messages.create({
       model: 'claude-sonnet-4-6',
-      max_tokens: 4096, // Fix 1 — Raised from 1024 to avoid silent truncation on large bills
+      max_tokens: 4096,
+      tools: [
+        {
+          name: 'extract_bill_data',
+          description: 'Extract rooms and line items from a handwritten curtain tailor site visit note',
+          input_schema: {
+            type: 'object',
+            properties: {
+              rooms: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    name: { type: 'string', description: 'Room name, e.g. "Living Room"' },
+                    items: {
+                      type: 'array',
+                      items: {
+                        type: 'object',
+                        properties: {
+                          product_name: { type: 'string' },
+                          quantity: { type: 'number' },
+                          unit: { type: 'string', description: 'e.g. sqft, mts, piece, on ft' },
+                          price: { type: 'number' },
+                          matched: { type: 'boolean', description: 'true if matched to catalogue' },
+                        },
+                        required: ['product_name', 'quantity', 'unit', 'price', 'matched'],
+                      },
+                    },
+                  },
+                  required: ['name', 'items'],
+                },
+              },
+            },
+            required: ['rooms'],
+          },
+        },
+      ],
+      tool_choice: { type: 'tool', name: 'extract_bill_data' },
       messages: [
         {
           role: 'user',
@@ -83,35 +102,28 @@ Rules:
               type: 'image',
               source: {
                 type: 'base64',
-                media_type: media_type as AllowedMediaType, // Fix 2 — type is now guaranteed by allowlist check
+                media_type: media_type as AllowedMediaType,
                 data: image_base64,
               },
             },
-            { type: 'text', text: prompt },
+            { type: 'text', text: userPrompt },
           ],
         },
       ],
     })
 
-    // Fix 3 — Guard against empty content array
-    const firstBlock = response.content[0]
-    const text = firstBlock?.type === 'text' ? firstBlock.text.trim() : ''
-
-    let extracted: { rooms: unknown[] }
-    try {
-      // Fix 4 — Strip markdown code fences before parsing
-      const cleaned = text.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '').trim()
-      extracted = JSON.parse(cleaned)
-    } catch {
+    const toolUseBlock = response.content.find(b => b.type === 'tool_use')
+    if (!toolUseBlock || toolUseBlock.type !== 'tool_use') {
       return new Response(
-        JSON.stringify({ error: "Couldn't read this image — try a clearer photo" }),
+        JSON.stringify({ error: "Couldn't extract data from this image — please try again" }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
+    const extracted = toolUseBlock.input as { rooms: unknown[] }
     if (!Array.isArray(extracted?.rooms)) {
       return new Response(
-        JSON.stringify({ error: "Couldn't read this image — try a clearer photo" }),
+        JSON.stringify({ error: "Couldn't extract data from this image — please try again" }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
