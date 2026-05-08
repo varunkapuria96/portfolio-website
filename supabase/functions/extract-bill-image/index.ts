@@ -13,7 +13,7 @@ if (!ANTHROPIC_API_KEY) {
 const client = new Anthropic({ apiKey: ANTHROPIC_API_KEY })
 
 // Fix 2 — Allowlist for accepted media types
-const ALLOWED_MEDIA_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'] as const
+const ALLOWED_MEDIA_TYPES = ['image/jpeg', 'image/png', 'image/webp'] as const
 type AllowedMediaType = typeof ALLOWED_MEDIA_TYPES[number]
 
 Deno.serve(async (req) => {
