@@ -5,6 +5,17 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+// Fix 5 — Validate API key at startup and instantiate client once at module level
+const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY')
+if (!ANTHROPIC_API_KEY) {
+  throw new Error('ANTHROPIC_API_KEY environment variable is required')
+}
+const client = new Anthropic({ apiKey: ANTHROPIC_API_KEY })
+
+// Fix 2 — Allowlist for accepted media types
+const ALLOWED_MEDIA_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'] as const
+type AllowedMediaType = typeof ALLOWED_MEDIA_TYPES[number]
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -20,7 +31,13 @@ Deno.serve(async (req) => {
       )
     }
 
-    const client = new Anthropic({ apiKey: Deno.env.get('ANTHROPIC_API_KEY') })
+    // Fix 2 — Validate media_type against allowlist
+    if (!ALLOWED_MEDIA_TYPES.includes(media_type as AllowedMediaType)) {
+      return new Response(
+        JSON.stringify({ error: 'Unsupported image type. Please use JPEG, PNG, or WebP.' }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
 
     const productList = (products || [])
       .map((p: { name: string; unit: string; price: number }) => `- ${p.name} (unit: ${p.unit}, price: ${p.price})`)
@@ -57,7 +74,7 @@ Rules:
 
     const response = await client.messages.create({
       model: 'claude-sonnet-4-6',
-      max_tokens: 1024,
+      max_tokens: 4096, // Fix 1 — Raised from 1024 to avoid silent truncation on large bills
       messages: [
         {
           role: 'user',
@@ -66,7 +83,7 @@ Rules:
               type: 'image',
               source: {
                 type: 'base64',
-                media_type: media_type as 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp',
+                media_type: media_type as AllowedMediaType, // Fix 2 — type is now guaranteed by allowlist check
                 data: image_base64,
               },
             },
@@ -76,11 +93,15 @@ Rules:
       ],
     })
 
-    const text = response.content[0].type === 'text' ? response.content[0].text.trim() : ''
+    // Fix 3 — Guard against empty content array
+    const firstBlock = response.content[0]
+    const text = firstBlock?.type === 'text' ? firstBlock.text.trim() : ''
 
     let extracted: { rooms: unknown[] }
     try {
-      extracted = JSON.parse(text)
+      // Fix 4 — Strip markdown code fences before parsing
+      const cleaned = text.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '').trim()
+      extracted = JSON.parse(cleaned)
     } catch {
       return new Response(
         JSON.stringify({ error: "Couldn't read this image — try a clearer photo" }),
