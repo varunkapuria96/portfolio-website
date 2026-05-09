@@ -11,7 +11,7 @@ function withKeys(rooms) {
   }))
 }
 
-export default function BillImportModal({ status, extractedRooms, errorMessage, onConfirm, onClose, onRetry, availableRooms = [], availableProducts = [], onAddRoom, onAddProduct }) {
+export default function BillImportModal({ status, extractedRooms, errorMessage, loadingMessage, warningMessage, onConfirm, onClose, onRetry, availableRooms = [], availableProducts = [], onAddRoom, onAddProduct }) {
   const [rooms, setRooms] = useState(() => withKeys(extractedRooms))
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -70,7 +70,7 @@ export default function BillImportModal({ status, extractedRooms, errorMessage, 
           {status === 'loading' && (
             <div className="import-loading">
               <div className="import-spinner" />
-              <div>Reading your note…</div>
+              <div>{loadingMessage || 'Reading your note…'}</div>
               <div className="import-loading-sub">This takes a few seconds</div>
             </div>
           )}
@@ -87,6 +87,9 @@ export default function BillImportModal({ status, extractedRooms, errorMessage, 
               <div className="import-no-rooms">No rooms found — try a clearer photo</div>
             ) : (
               <>
+                {warningMessage && (
+                  <div className="import-warning">{warningMessage}</div>
+                )}
                 <p className="import-hint">
                   Review and edit before adding to bill. Highlighted items weren't matched to your catalogue.
                 </p>

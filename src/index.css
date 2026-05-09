@@ -1673,6 +1673,16 @@ body {
   margin-top: 0;
 }
 
+.import-warning {
+  background: #fff8e1;
+  border: 1px solid #f5c518;
+  border-radius: 6px;
+  color: #7a5c00;
+  font-size: 13px;
+  margin-bottom: 12px;
+  padding: 8px 12px;
+}
+
 .import-no-rooms {
   color: #555;
   font-size: 13px;

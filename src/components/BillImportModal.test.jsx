@@ -141,4 +141,46 @@ describe('BillImportModal', () => {
     )
     expect(screen.getByText(/no rooms found/i)).toBeInTheDocument()
   })
+
+  it('shows custom loadingMessage when provided', () => {
+    render(
+      <BillImportModal
+        status="loading"
+        extractedRooms={[]}
+        loadingMessage="Reading image 2 of 3…"
+        onConfirm={vi.fn()}
+        onClose={vi.fn()}
+        onRetry={vi.fn()}
+      />
+    )
+    expect(screen.getByText('Reading image 2 of 3…')).toBeInTheDocument()
+    expect(screen.queryByText('Reading your note…')).not.toBeInTheDocument()
+  })
+
+  it('falls back to default loading text when loadingMessage is not provided', () => {
+    render(
+      <BillImportModal
+        status="loading"
+        extractedRooms={[]}
+        onConfirm={vi.fn()}
+        onClose={vi.fn()}
+        onRetry={vi.fn()}
+      />
+    )
+    expect(screen.getByText('Reading your note…')).toBeInTheDocument()
+  })
+
+  it('shows warning banner in review state when warningMessage is provided', () => {
+    render(
+      <BillImportModal
+        status="review"
+        extractedRooms={sampleRooms}
+        warningMessage="1 of 2 images couldn't be read — rooms below are from the others"
+        onConfirm={vi.fn()}
+        onClose={vi.fn()}
+        onRetry={vi.fn()}
+      />
+    )
+    expect(screen.getByText(/1 of 2 images couldn't be read/)).toBeInTheDocument()
+  })
 })
