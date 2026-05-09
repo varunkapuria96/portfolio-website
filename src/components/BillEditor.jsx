@@ -27,7 +27,6 @@ export default function BillEditor({ session, billId, onBack }) {
   const [importStatus, setImportStatus] = useState('loading')
   const [importExtracted, setImportExtracted] = useState([])
   const [importError, setImportError] = useState('')
-  const [importFileError, setImportFileError] = useState('')
   const [importWarning, setImportWarning] = useState('')
   const [importProgress, setImportProgress] = useState({ current: 0, total: 0 })
   const fileInputRef = useRef(null)
@@ -138,7 +137,6 @@ export default function BillEditor({ session, billId, onBack }) {
     const fileList = Array.from(files)
     const total = fileList.length
 
-    setImportFileError('')
     setImportModalOpen(true)
     setImportStatus('loading')
     setImportError('')
@@ -305,7 +303,6 @@ export default function BillEditor({ session, billId, onBack }) {
                 style={{ display: 'none' }}
                 onChange={e => { if (e.target.files?.length) handleImageFiles(e.target.files); e.target.value = '' }}
               />
-              {importFileError && <div className="import-file-error">{importFileError}</div>}
             </div>
             <button className="print-btn" onClick={() => window.print()}>Print / Save PDF</button>
           </div>
