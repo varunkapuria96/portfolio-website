@@ -28,6 +28,8 @@ export default function BillEditor({ session, billId, onBack }) {
   const [importExtracted, setImportExtracted] = useState([])
   const [importError, setImportError] = useState('')
   const [importFileError, setImportFileError] = useState('')
+  const [importWarning, setImportWarning] = useState('')
+  const [importProgress, setImportProgress] = useState({ current: 0, total: 0 })
   const fileInputRef = useRef(null)
 
   useEffect(() => {
@@ -132,40 +134,70 @@ export default function BillEditor({ session, billId, onBack }) {
     })
   }
 
-  async function handleImageFile(file) {
-    if (file.size > 5 * 1024 * 1024) {
-      setImportFileError('Image must be under 5MB')
-      return
-    }
+  async function handleImageFiles(files) {
+    const fileList = Array.from(files)
+    const total = fileList.length
+
     setImportFileError('')
     setImportModalOpen(true)
     setImportStatus('loading')
     setImportError('')
+    setImportWarning('')
     setImportExtracted([])
+    setImportProgress({ current: 0, total })
 
-    let base64
-    try {
-      base64 = await fileToBase64(file)
-    } catch {
+    const allRooms = []
+    let failedCount = 0
+
+    for (let i = 0; i < fileList.length; i++) {
+      const file = fileList[i]
+      setImportProgress({ current: i + 1, total })
+
+      if (file.size > 5 * 1024 * 1024) {
+        failedCount++
+        continue
+      }
+
+      let base64
+      try {
+        base64 = await fileToBase64(file)
+      } catch {
+        failedCount++
+        continue
+      }
+
+      const { data, error } = await supabase.functions.invoke('extract-bill-image', {
+        body: {
+          image_base64: base64,
+          media_type: file.type,
+          products: availableProducts.map(p => ({ name: p.name, unit: p.unit, price: p.price })),
+        },
+      })
+
+      if (error || data?.error || !Array.isArray(data?.rooms)) {
+        failedCount++
+        continue
+      }
+
+      allRooms.push(...data.rooms)
+    }
+
+    if (allRooms.length === 0) {
       setImportStatus('error')
-      setImportError('Could not read the image file. Please try again.')
+      setImportError(
+        failedCount > 0
+          ? 'None of the images could be read — try clearer photos'
+          : 'No rooms found in the images'
+      )
       return
     }
-    const { data, error } = await supabase.functions.invoke('extract-bill-image', {
-      body: {
-        image_base64: base64,
-        media_type: file.type,
-        products: availableProducts.map(p => ({ name: p.name, unit: p.unit, price: p.price })),
-      },
-    })
 
-    if (error || data?.error || !Array.isArray(data?.rooms)) {
-      setImportStatus('error')
-      setImportError(data?.error || 'Failed to process image')
-      return
+    setImportExtracted(allRooms)
+    if (failedCount > 0) {
+      setImportWarning(
+        `${failedCount} of ${total} image${total > 1 ? 's' : ''} couldn't be read — rooms below are from the others`
+      )
     }
-
-    setImportExtracted(data.rooms)
     setImportStatus('review')
   }
 
@@ -269,8 +301,9 @@ export default function BillEditor({ session, billId, onBack }) {
                 ref={fileInputRef}
                 type="file"
                 accept="image/*"
+                multiple
                 style={{ display: 'none' }}
-                onChange={e => { if (e.target.files?.[0]) handleImageFile(e.target.files[0]); e.target.value = '' }}
+                onChange={e => { if (e.target.files?.length) handleImageFiles(e.target.files); e.target.value = '' }}
               />
               {importFileError && <div className="import-file-error">{importFileError}</div>}
             </div>
@@ -449,6 +482,12 @@ export default function BillEditor({ session, billId, onBack }) {
           status={importStatus}
           extractedRooms={importExtracted}
           errorMessage={importError}
+          loadingMessage={
+            importProgress.total > 1
+              ? `Reading image ${importProgress.current} of ${importProgress.total}…`
+              : undefined
+          }
+          warningMessage={importWarning}
           availableRooms={availableRooms}
           availableProducts={availableProducts}
           onAddRoom={addRoomToCatalogue}
