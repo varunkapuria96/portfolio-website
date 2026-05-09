@@ -142,7 +142,7 @@ export default function BillEditor({ session, billId, onBack }) {
     setImportError('')
     setImportWarning('')
     setImportExtracted([])
-    setImportProgress({ current: 0, total })
+    setImportProgress({ current: 1, total })
 
     const allRooms = []
     let failedCount = 0
