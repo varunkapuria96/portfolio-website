@@ -183,4 +183,18 @@ describe('BillImportModal', () => {
     )
     expect(screen.getByText(/1 of 2 images couldn't be read/)).toBeInTheDocument()
   })
+
+  it('does not show warningMessage when review has no rooms', () => {
+    render(
+      <BillImportModal
+        status="review"
+        extractedRooms={[]}
+        warningMessage="Something failed"
+        onConfirm={vi.fn()}
+        onClose={vi.fn()}
+        onRetry={vi.fn()}
+      />
+    )
+    expect(screen.queryByText('Something failed')).not.toBeInTheDocument()
+  })
 })
