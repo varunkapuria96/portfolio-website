@@ -34,7 +34,7 @@ export function TodoRoute() {
 
   if (session === undefined) return null
   if (session && recoveryMode) return <ResetPassword onDone={() => setRecoveryMode(false)} />
-  return session ? <TodoApp session={session} /> : <AuthForm />
+  return session ? <TodoApp session={session} /> : <AuthForm title="Todo App" />
 }
 
 export function BillRoute() {
@@ -53,7 +53,7 @@ export function BillRoute() {
   }, [])
 
   if (session === undefined) return null
-  return session ? <BillsApp session={session} /> : <AuthForm />
+  return session ? <BillsApp session={session} /> : <AuthForm title="Bills App" />
 }
 
 export default function App() {

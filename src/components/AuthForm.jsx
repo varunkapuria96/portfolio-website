@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { supabase } from '../supabase'
 
-export default function AuthForm() {
+export default function AuthForm({ title = 'Todo App' }) {
   const [mode, setMode] = useState('signin')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -39,7 +39,7 @@ export default function AuthForm() {
   if (mode === 'forgot') {
     return (
       <div className="auth-container">
-        <h1>Todo App</h1>
+        <h1>{title}</h1>
         {resetSent ? (
           <p className="auth-info">Check your email for a password reset link.</p>
         ) : (
@@ -70,7 +70,7 @@ export default function AuthForm() {
 
   return (
     <div className="auth-container">
-      <h1>Todo App</h1>
+      <h1>{title}</h1>
       <form onSubmit={handleSubmit}>
         <input
           type="email"
