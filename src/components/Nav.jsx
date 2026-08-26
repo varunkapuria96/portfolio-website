@@ -26,6 +26,12 @@ export default function Nav({ session }) {
         >
           bills
         </Link>
+        <Link
+          to="/projects/jobs"
+          className={pathname.startsWith('/projects/jobs') ? 'active' : undefined}
+        >
+          jobs
+        </Link>
         <a href="mailto:me@varunkapuria.xyz" className="nav-cta">
           me@varunkapuria.xyz
         </a>

@@ -8,6 +8,7 @@ import AuthForm from './components/AuthForm'
 import TodoApp from './components/TodoApp'
 import ResetPassword from './components/ResetPassword'
 import BillsApp from './components/BillsApp'
+import JobsApp from './components/JobsApp'
 
 export function TodoRoute() {
   const [session, setSession] = useState(undefined)
@@ -56,6 +57,25 @@ export function BillRoute() {
   return session ? <BillsApp session={session} /> : <AuthForm title="Bills App" />
 }
 
+export function JobsRoute() {
+  const [session, setSession] = useState(undefined)
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+    })
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_, session) => setSession(session)
+    )
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  if (session === undefined) return null
+  return session ? <JobsApp session={session} /> : <AuthForm title="Jobs App" />
+}
+
 export default function App() {
   const [session, setSession] = useState(undefined)
 
@@ -73,6 +93,7 @@ export default function App() {
         <Route path="/projects/todo" element={<TodoRoute />} />
         <Route path="/projects/sql-website" element={<SqlWebsite />} />
         <Route path="/projects/bills" element={<BillRoute />} />
+        <Route path="/projects/jobs" element={<JobsRoute />} />
       </Routes>
     </BrowserRouter>
   )
