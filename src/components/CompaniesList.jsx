@@ -142,6 +142,9 @@ export default function CompaniesList({ session }) {
           value={form.careers_url}
           onChange={e => setForm(f => ({ ...f, careers_url: e.target.value }))}
         />
+        <p className="jobs-card-meta">
+          Use the company's job listing page (not a single job link) so Refresh Jobs can find new postings.
+        </p>
         <select
           className="manage-input"
           value={form.priority}
