@@ -4,6 +4,7 @@ import CompaniesList from './CompaniesList'
 import JobsList from './JobsList'
 import ContactsList from './ContactsList'
 import JobFinds from './JobFinds'
+import ResumeSettings from './ResumeSettings'
 
 export default function JobsApp({ session }) {
   const [tab, setTab] = useState('jobs')
@@ -32,6 +33,9 @@ export default function JobsApp({ session }) {
         <button className={tab === 'finds' ? 'active' : ''} onClick={() => setTab('finds')}>
           New Finds{pendingFinds > 0 ? ` (${pendingFinds})` : ''}
         </button>
+        <button className={tab === 'resume' ? 'active' : ''} onClick={() => setTab('resume')}>
+          Resume
+        </button>
       </div>
 
       <div className="bills-content">
@@ -39,6 +43,7 @@ export default function JobsApp({ session }) {
         {tab === 'companies' && <CompaniesList session={session} />}
         {tab === 'contacts' && <ContactsList session={session} />}
         {tab === 'finds' && <JobFinds session={session} />}
+        {tab === 'resume' && <ResumeSettings session={session} />}
       </div>
     </div>
   )

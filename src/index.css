@@ -1249,6 +1249,10 @@ body {
 .jobs-status-rejected, .jobs-outreach-no_response { background: #fee2e2; color: #b91c1c; }
 .jobs-status-archived { background: #f1f5f9; color: #94a3b8; }
 
+.jobs-score-high { background: #dcfce7; color: #15803d; }
+.jobs-score-mid { background: #dbeafe; color: #1d4ed8; }
+.jobs-score-low { background: #f1f5f9; color: #94a3b8; }
+
 .jobs-edit-form { display: flex; flex-direction: column; gap: 8px; }
 
 .jobs-edit-actions { display: flex; gap: 8px; }

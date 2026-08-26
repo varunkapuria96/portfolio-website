@@ -7,6 +7,7 @@ vi.mock('./JobsList', () => ({ default: () => <div>Jobs List</div> }))
 vi.mock('./CompaniesList', () => ({ default: () => <div>Companies List</div> }))
 vi.mock('./ContactsList', () => ({ default: () => <div>Contacts List</div> }))
 vi.mock('./JobFinds', () => ({ default: () => <div>Job Finds</div> }))
+vi.mock('./ResumeSettings', () => ({ default: () => <div>Resume Settings</div> }))
 
 vi.mock('../supabase', () => ({
   supabase: {
@@ -49,5 +50,12 @@ describe('JobsApp', () => {
     await userEvent.click(screen.getByRole('button', { name: /new finds/i }))
     const content = container.querySelector('.bills-content')
     expect(within(content).getByText('Job Finds')).toBeInTheDocument()
+  })
+
+  it('switches to Resume tab', async () => {
+    const { container } = render(<JobsApp session={mockSession} />)
+    await userEvent.click(screen.getByRole('button', { name: /resume/i }))
+    const content = container.querySelector('.bills-content')
+    expect(within(content).getByText('Resume Settings')).toBeInTheDocument()
   })
 })
