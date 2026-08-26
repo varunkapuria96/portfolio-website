@@ -171,10 +171,14 @@ async function fetchPostingsFor(careersUrl: string): Promise<Posting[]> {
 type MatchCandidate = { index: number; title: string; company: string; location: string | null; description: string | null }
 type MatchResult = { index: number; score: number; reason: string }
 
-async function scoreBatch(resumeText: string, candidates: MatchCandidate[]): Promise<MatchResult[]> {
+async function scoreBatch(resumeText: string, locationPreference: string | null, candidates: MatchCandidate[]): Promise<MatchResult[]> {
   const list = candidates
     .map(c => `[${c.index}] ${c.title} at ${c.company}${c.location ? ` (${c.location})` : ''}${c.description ? `\n${c.description.slice(0, 1500)}` : ''}`)
     .join('\n\n')
+
+  const locationInstruction = locationPreference
+    ? `\n\nLocation preference: ${locationPreference}. Treat this as a hard factor in the score — a posting clearly outside this preference (e.g. a different country, or explicitly not open to it) should score well below 60 even if the role itself is a strong fit, unless the location is remote/unspecified/ambiguous enough that it could plausibly satisfy the preference.`
+    : ''
 
   const response = await anthropic.messages.create({
     model: 'claude-sonnet-4-6',
@@ -207,7 +211,7 @@ async function scoreBatch(resumeText: string, candidates: MatchCandidate[]): Pro
     messages: [
       {
         role: 'user',
-        content: `Candidate resume:\n${resumeText.slice(0, 8000)}\n\nJob postings:\n${list}\n\nFor each posting, score 0-100 how well it fits this candidate's background and experience level using the score_job_matches tool. Be discriminating — a generic title match without relevant experience should score low.`,
+        content: `Candidate resume:\n${resumeText.slice(0, 8000)}\n\nJob postings:\n${list}\n\nFor each posting, score 0-100 how well it fits this candidate's background and experience level using the score_job_matches tool. Be discriminating — a generic title match without relevant experience should score low.${locationInstruction}`,
       },
     ],
   })
@@ -218,13 +222,13 @@ async function scoreBatch(resumeText: string, candidates: MatchCandidate[]): Pro
   return Array.isArray(extracted?.results) ? extracted.results : []
 }
 
-async function scoreAll(resumeText: string, candidates: MatchCandidate[]): Promise<Map<number, MatchResult>> {
+async function scoreAll(resumeText: string, locationPreference: string | null, candidates: MatchCandidate[]): Promise<Map<number, MatchResult>> {
   const results = new Map<number, MatchResult>()
   const chunkSize = 15
   for (let i = 0; i < candidates.length; i += chunkSize) {
     const chunk = candidates.slice(i, i + chunkSize)
     try {
-      const scored = await scoreBatch(resumeText, chunk)
+      const scored = await scoreBatch(resumeText, locationPreference, chunk)
       for (const r of scored) results.set(r.index, r)
     } catch {
       // Leave this chunk unscored rather than failing the whole refresh
@@ -261,6 +265,14 @@ Deno.serve(async (req) => {
       })
     }
 
+    let rescoreAll = false
+    try {
+      const body = await req.json()
+      rescoreAll = !!body?.rescore_all
+    } catch {
+      // No/invalid JSON body is fine — default behavior
+    }
+
     const { data: companies } = await supabase
       .from('companies')
       .select('id, name, careers_url')
@@ -279,17 +291,22 @@ Deno.serve(async (req) => {
 
     const { data: resumeRow } = await supabase
       .from('resume_profile')
-      .select('resume_text')
+      .select('resume_text, location_preference')
       .eq('user_id', user.id)
       .maybeSingle()
     const resumeText = resumeRow?.resume_text || null
+    const locationPreference = resumeRow?.location_preference || null
 
-    // Backfill scores on finds staged before a resume was on file
+    // Backfill scores on finds staged before a resume was on file (or, if rescore_all
+    // is set, everything pending — used after the resume/location preference changes)
     let rescored = 0
     if (resumeText) {
+      let findsQuery = supabase.from('job_finds').select('id, company_id, title, location').eq('status', 'pending')
+      if (!rescoreAll) findsQuery = findsQuery.is('match_score', null)
+
       const [{ data: allCompanies }, { data: unscoredFinds }] = await Promise.all([
         supabase.from('companies').select('id, name'),
-        supabase.from('job_finds').select('id, company_id, title, location').eq('status', 'pending').is('match_score', null),
+        findsQuery,
       ])
       const companyNameById = new Map<string, string>((allCompanies || []).map((c: { id: string; name: string }) => [c.id, c.name]))
       const toRescore = (unscoredFinds || []) as { id: string; company_id: string; title: string; location: string | null }[]
@@ -302,7 +319,7 @@ Deno.serve(async (req) => {
           location: f.location,
           description: null,
         }))
-        const backfillScores = await scoreAll(resumeText, candidates)
+        const backfillScores = await scoreAll(resumeText, locationPreference, candidates)
         await Promise.all(
           toRescore.map((f, index) => {
             const scored = backfillScores.get(index)
@@ -320,16 +337,18 @@ Deno.serve(async (req) => {
     const errors: { company_name: string; message: string }[] = []
     const found: { company: Company; posting: Posting }[] = []
 
-    for (const company of activeCompanies) {
-      try {
-        const postings = await fetchPostingsFor(company.careers_url)
-        for (const posting of postings) {
-          if (!posting.job_url || seenUrls.has(posting.job_url)) continue
-          seenUrls.add(posting.job_url)
-          found.push({ company, posting })
+    if (!rescoreAll) {
+      for (const company of activeCompanies) {
+        try {
+          const postings = await fetchPostingsFor(company.careers_url)
+          for (const posting of postings) {
+            if (!posting.job_url || seenUrls.has(posting.job_url)) continue
+            seenUrls.add(posting.job_url)
+            found.push({ company, posting })
+          }
+        } catch (err) {
+          errors.push({ company_name: company.name, message: err instanceof Error ? err.message : 'Unknown error' })
         }
-      } catch (err) {
-        errors.push({ company_name: company.name, message: err instanceof Error ? err.message : 'Unknown error' })
       }
     }
 
@@ -342,7 +361,7 @@ Deno.serve(async (req) => {
         location: f.posting.location,
         description: f.posting.description || null,
       }))
-      scores = await scoreAll(resumeText, candidates)
+      scores = await scoreAll(resumeText, locationPreference, candidates)
     }
 
     const rowsToInsert: ScoredRow[] = found.map((f, index) => {
@@ -369,7 +388,7 @@ Deno.serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ checked_companies: activeCompanies.length, new_finds: newFinds, rescored, scored: !!resumeText, errors }),
+      JSON.stringify({ checked_companies: rescoreAll ? 0 : activeCompanies.length, new_finds: newFinds, rescored, scored: !!resumeText, errors }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (err) {

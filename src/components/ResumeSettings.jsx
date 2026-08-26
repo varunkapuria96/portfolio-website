@@ -12,17 +12,30 @@ function fileToBase64(file) {
 
 export default function ResumeSettings({ session }) {
   const [resume, setResume] = useState(null)
+  const [locationPreference, setLocationPreference] = useState('')
   const [status, setStatus] = useState('idle')
   const [error, setError] = useState('')
+  const [rescoreNote, setRescoreNote] = useState('')
 
   useEffect(() => {
     supabase
       .from('resume_profile')
-      .select('filename, updated_at')
+      .select('filename, updated_at, location_preference')
       .eq('user_id', session.user.id)
       .maybeSingle()
-      .then(({ data }) => { if (data) setResume(data) })
+      .then(({ data }) => {
+        if (data) {
+          setResume(data)
+          setLocationPreference(data.location_preference || '')
+        }
+      })
   }, [session.user.id])
+
+  async function rescoreExistingFinds() {
+    setRescoreNote('Rescoring existing finds…')
+    const { data } = await supabase.functions.invoke('refresh-company-jobs', { body: { rescore_all: true } })
+    setRescoreNote(data?.rescored > 0 ? `Rescored ${data.rescored} find${data.rescored === 1 ? '' : 's'}.` : '')
+  }
 
   async function handleUpload(e) {
     const file = e.target.files[0]
@@ -62,12 +75,33 @@ export default function ResumeSettings({ session }) {
         return
       }
 
-      setResume(saved)
+      setResume(prev => ({ ...prev, ...saved }))
       setStatus('idle')
+      rescoreExistingFinds()
     } catch {
       setError("Couldn't read this resume — try again")
       setStatus('error')
     }
+  }
+
+  async function saveLocationPreference() {
+    setStatus('loading')
+    setError('')
+    const { data: saved, error: saveError } = await supabase
+      .from('resume_profile')
+      .upsert({ user_id: session.user.id, location_preference: locationPreference.trim() || null })
+      .select('filename, updated_at, location_preference')
+      .single()
+
+    if (saveError || !saved) {
+      setError('Could not save location preference — try again')
+      setStatus('error')
+      return
+    }
+
+    setResume(saved)
+    setStatus('idle')
+    rescoreExistingFinds()
   }
 
   return (
@@ -86,6 +120,7 @@ export default function ResumeSettings({ session }) {
       )}
 
       {status === 'error' && <p className="jobs-card-meta">{error}</p>}
+      {rescoreNote && <p className="jobs-card-meta">{rescoreNote}</p>}
 
       <label className="manage-add-btn" style={{ display: 'inline-block', cursor: 'pointer', marginTop: 12 }}>
         {status === 'loading' ? 'Reading resume…' : resume ? 'Replace resume (PDF)' : 'Upload resume (PDF)'}
@@ -97,6 +132,26 @@ export default function ResumeSettings({ session }) {
           style={{ display: 'none' }}
         />
       </label>
+
+      {resume && (
+        <div className="jobs-add-form" style={{ marginTop: 20 }}>
+          <label className="manage-company-label">
+            Location preference (optional)
+            <input
+              className="manage-input"
+              placeholder="e.g. India, preferred city Mumbai"
+              value={locationPreference}
+              onChange={e => setLocationPreference(e.target.value)}
+            />
+          </label>
+          <p className="jobs-card-meta">
+            Postings clearly outside this preference will score well below 60 on the New Finds tab, even if the role itself fits.
+          </p>
+          <button className="manage-add-btn" onClick={saveLocationPreference} disabled={status === 'loading'}>
+            Save preference
+          </button>
+        </div>
+      )}
     </div>
   )
 }
