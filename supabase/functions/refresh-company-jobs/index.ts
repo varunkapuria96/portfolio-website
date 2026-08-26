@@ -284,6 +284,39 @@ Deno.serve(async (req) => {
       .maybeSingle()
     const resumeText = resumeRow?.resume_text || null
 
+    // Backfill scores on finds staged before a resume was on file
+    let rescored = 0
+    if (resumeText) {
+      const [{ data: allCompanies }, { data: unscoredFinds }] = await Promise.all([
+        supabase.from('companies').select('id, name'),
+        supabase.from('job_finds').select('id, company_id, title, location').eq('status', 'pending').is('match_score', null),
+      ])
+      const companyNameById = new Map<string, string>((allCompanies || []).map((c: { id: string; name: string }) => [c.id, c.name]))
+      const toRescore = (unscoredFinds || []) as { id: string; company_id: string; title: string; location: string | null }[]
+
+      if (toRescore.length > 0) {
+        const candidates: MatchCandidate[] = toRescore.map((f, index) => ({
+          index,
+          title: f.title,
+          company: companyNameById.get(f.company_id) || 'Unknown company',
+          location: f.location,
+          description: null,
+        }))
+        const backfillScores = await scoreAll(resumeText, candidates)
+        await Promise.all(
+          toRescore.map((f, index) => {
+            const scored = backfillScores.get(index)
+            if (!scored) return Promise.resolve()
+            rescored++
+            return supabase
+              .from('job_finds')
+              .update({ match_score: Math.round(scored.score), match_reason: scored.reason })
+              .eq('id', f.id)
+          })
+        )
+      }
+    }
+
     const errors: { company_name: string; message: string }[] = []
     const found: { company: Company; posting: Posting }[] = []
 
@@ -336,7 +369,7 @@ Deno.serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ checked_companies: activeCompanies.length, new_finds: newFinds, scored: !!resumeText, errors }),
+      JSON.stringify({ checked_companies: activeCompanies.length, new_finds: newFinds, rescored, scored: !!resumeText, errors }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (err) {

@@ -95,6 +95,9 @@ export default function JobFinds({ session }) {
           {summary.error
             ? `Refresh failed: ${summary.error}`
             : `Checked ${summary.checked_companies} compan${summary.checked_companies === 1 ? 'y' : 'ies'}, found ${summary.new_finds} new posting${summary.new_finds === 1 ? '' : 's'}.`}
+          {summary.rescored > 0 && (
+            <span> Scored {summary.rescored} previously-unscored find{summary.rescored === 1 ? '' : 's'}.</span>
+          )}
           {summary.errors?.length > 0 && (
             <span> Couldn't check: {summary.errors.map(e => e.company_name).join(', ')}.</span>
           )}
