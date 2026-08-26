@@ -89,7 +89,8 @@ export default function ResumeSettings({ session }) {
     setError('')
     const { data: saved, error: saveError } = await supabase
       .from('resume_profile')
-      .upsert({ user_id: session.user.id, location_preference: locationPreference.trim() || null })
+      .update({ location_preference: locationPreference.trim() || null })
+      .eq('user_id', session.user.id)
       .select('filename, updated_at, location_preference')
       .single()
 

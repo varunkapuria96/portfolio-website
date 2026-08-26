@@ -16,6 +16,7 @@ function chain() {
     eq: vi.fn().mockReturnThis(),
     maybeSingle: vi.fn().mockResolvedValue({ data: null }),
     upsert: vi.fn().mockReturnThis(),
+    update: vi.fn().mockReturnThis(),
     single: vi.fn().mockResolvedValue({
       data: { filename: 'resume.pdf', updated_at: '2026-01-01T00:00:00.000Z', location_preference: null },
       error: null,
