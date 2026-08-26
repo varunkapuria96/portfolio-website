@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../supabase'
 
 const LOW_SCORE_THRESHOLD = 60
+const HIGH_PRIORITY_THRESHOLD = 80
 
 function sortByScore(a, b) {
   if (a.match_score == null && b.match_score == null) return 0
@@ -22,7 +23,7 @@ export default function JobFinds({ session }) {
   const [companies, setCompanies] = useState([])
   const [refreshing, setRefreshing] = useState(false)
   const [summary, setSummary] = useState(null)
-  const [showLowScoring, setShowLowScoring] = useState(false)
+  const [scoreFilter, setScoreFilter] = useState('default')
 
   function loadFinds() {
     return supabase
@@ -76,18 +77,27 @@ export default function JobFinds({ session }) {
     setFinds(prev => prev.filter(f => f.id !== id))
   }
 
-  const lowScoringCount = finds.filter(f => f.match_score != null && f.match_score < LOW_SCORE_THRESHOLD).length
-  const visibleFinds = showLowScoring
-    ? finds
-    : finds.filter(f => f.match_score == null || f.match_score >= LOW_SCORE_THRESHOLD)
+  const visibleFinds = finds.filter(f => {
+    if (scoreFilter === 'all') return true
+    if (scoreFilter === 'high') return f.match_score != null && f.match_score >= HIGH_PRIORITY_THRESHOLD
+    return f.match_score == null || f.match_score >= LOW_SCORE_THRESHOLD
+  })
+  const hiddenCount = finds.length - visibleFinds.length
 
   return (
     <div className="jobs-section">
       <div className="jobs-section-header">
         <h2>New Finds</h2>
-        <button className="manage-add-btn" onClick={refresh} disabled={refreshing}>
-          {refreshing ? 'Refreshing…' : 'Refresh Jobs'}
-        </button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <select className="manage-input jobs-filter" value={scoreFilter} onChange={e => setScoreFilter(e.target.value)}>
+            <option value="default">Matches ({LOW_SCORE_THRESHOLD}+)</option>
+            <option value="high">High priority ({HIGH_PRIORITY_THRESHOLD}+)</option>
+            <option value="all">All, including low-scoring</option>
+          </select>
+          <button className="manage-add-btn" onClick={refresh} disabled={refreshing}>
+            {refreshing ? 'Refreshing…' : 'Refresh Jobs'}
+          </button>
+        </div>
       </div>
 
       {summary && (
@@ -107,15 +117,10 @@ export default function JobFinds({ session }) {
         </p>
       )}
 
-      {lowScoringCount > 0 && (
-        <label className="jobs-card-meta" style={{ display: 'block', marginBottom: 12 }}>
-          <input
-            type="checkbox"
-            checked={showLowScoring}
-            onChange={e => setShowLowScoring(e.target.checked)}
-          />{' '}
-          Show low-scoring finds (&lt;{LOW_SCORE_THRESHOLD}) — {lowScoringCount} hidden
-        </label>
+      {scoreFilter !== 'all' && hiddenCount > 0 && (
+        <p className="jobs-card-meta" style={{ marginBottom: 12 }}>
+          {hiddenCount} find{hiddenCount === 1 ? '' : 's'} hidden by this filter — switch to "All, including low-scoring" to see them.
+        </p>
       )}
 
       {visibleFinds.length === 0 ? (

@@ -8,7 +8,8 @@ const mockSession = { user: { id: 'user-123' } }
 const mockCompanies = [{ id: 'c1', name: 'Acme Corp' }]
 let mockFinds = [
   { id: 'f1', company_id: 'c1', title: 'Backend Engineer', location: 'Remote', job_url: 'https://acme.example/jobs/1', status: 'pending', match_score: 85, match_reason: 'Strong fit on backend experience.' },
-  { id: 'f2', company_id: 'c1', title: 'Sales Intern', location: 'Remote', job_url: 'https://acme.example/jobs/2', status: 'pending', match_score: 30, match_reason: 'Entry-level, not a fit.' },
+  { id: 'f2', company_id: 'c1', title: 'Support Engineer', location: 'Remote', job_url: 'https://acme.example/jobs/3', status: 'pending', match_score: 70, match_reason: 'Decent fit, adjacent role.' },
+  { id: 'f3', company_id: 'c1', title: 'Sales Intern', location: 'Remote', job_url: 'https://acme.example/jobs/2', status: 'pending', match_score: 30, match_reason: 'Entry-level, not a fit.' },
 ]
 
 const invoke = vi.fn().mockResolvedValue({ data: { checked_companies: 1, new_finds: 2, errors: [] }, error: null })
@@ -33,7 +34,8 @@ beforeEach(() => {
   vi.clearAllMocks()
   mockFinds = [
     { id: 'f1', company_id: 'c1', title: 'Backend Engineer', location: 'Remote', job_url: 'https://acme.example/jobs/1', status: 'pending', match_score: 85, match_reason: 'Strong fit on backend experience.' },
-    { id: 'f2', company_id: 'c1', title: 'Sales Intern', location: 'Remote', job_url: 'https://acme.example/jobs/2', status: 'pending', match_score: 30, match_reason: 'Entry-level, not a fit.' },
+    { id: 'f2', company_id: 'c1', title: 'Support Engineer', location: 'Remote', job_url: 'https://acme.example/jobs/3', status: 'pending', match_score: 70, match_reason: 'Decent fit, adjacent role.' },
+    { id: 'f3', company_id: 'c1', title: 'Sales Intern', location: 'Remote', job_url: 'https://acme.example/jobs/2', status: 'pending', match_score: 30, match_reason: 'Entry-level, not a fit.' },
   ]
   invoke.mockResolvedValue({ data: { checked_companies: 1, new_finds: 2, errors: [] }, error: null })
   supabase.from.mockImplementation(table => chainFor(table))
@@ -43,16 +45,26 @@ describe('JobFinds', () => {
   it('renders pending finds with company name and score', async () => {
     render(<JobFinds session={mockSession} />)
     expect(await screen.findByText('Backend Engineer')).toBeInTheDocument()
-    expect(screen.getByText(/Acme Corp/)).toBeInTheDocument()
+    expect(screen.getAllByText(/Acme Corp/).length).toBeGreaterThan(0)
     expect(screen.getByText('85 match')).toBeInTheDocument()
   })
 
-  it('hides low-scoring finds by default and reveals them via the toggle', async () => {
+  it('hides low-scoring finds by default and reveals them via the "all" filter', async () => {
     render(<JobFinds session={mockSession} />)
     await screen.findByText('Backend Engineer')
+    expect(screen.getByText('Support Engineer')).toBeInTheDocument()
     expect(screen.queryByText('Sales Intern')).not.toBeInTheDocument()
-    await userEvent.click(screen.getByRole('checkbox', { name: /show low-scoring finds/i }))
+    await userEvent.selectOptions(screen.getByRole('combobox'), 'all')
     expect(await screen.findByText('Sales Intern')).toBeInTheDocument()
+  })
+
+  it('filters to high-priority (80+) finds only', async () => {
+    render(<JobFinds session={mockSession} />)
+    await screen.findByText('Backend Engineer')
+    await userEvent.selectOptions(screen.getByRole('combobox'), 'high')
+    expect(screen.getByText('Backend Engineer')).toBeInTheDocument()
+    expect(screen.queryByText('Support Engineer')).not.toBeInTheDocument()
+    expect(screen.queryByText('Sales Intern')).not.toBeInTheDocument()
   })
 
   it('calls the refresh edge function and shows a summary', async () => {
